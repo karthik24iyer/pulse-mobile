@@ -1,0 +1,74 @@
+# Pulse+ APK (personal branch): every push to `personal` builds the release APK, keeps it as a run artifact, and puts it
+# on the rolling "pulse-plus-latest" GitHub Release so it can be downloaded straight from a phone. Run it by hand from
+# the Actions tab too (Run workflow).
+#
+# The build is the one PERSONAL.md describes: prebuild, then Gradle's assembleRelease for arm64. The release build is
+# signed with Expo's template debug key, the same file on every machine, so each APK installs over the last one (and over
+# one built locally) and keeps the app's data.
+name: Pulse+ APK
+
+on:
+  push:
+    branches: [personal]
+  workflow_dispatch:
+
+# Writes the release; nothing else.
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      # Reads the pnpm version from package.json "packageManager".
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+      # Install scripts run (Skia's native libraries come from one; pnpm-workspace.yaml allows it).
+      - run: pnpm install --frozen-lockfile
+      - name: prebuild
+        run: npx expo prebuild -p android --clean --no-install
+      - name: assemble release APK
+        working-directory: android
+        run: ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a --no-daemon
+      - name: name the APK
+        id: apk
+        run: |
+          version=$(node -p "require('./app.json').expo.version")
+          name="pulse-plus-${version}-${GITHUB_SHA::7}-arm64.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/$name"
+          echo "path=$RUNNER_TEMP/$name" >> "$GITHUB_OUTPUT"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v5
+        with:
+          name: ${{ steps.apk.outputs.name }}
+          path: ${{ steps.apk.outputs.path }}
+          retention-days: 30
+      # One rolling release, replaced by each build, so its download link always gives the newest APK.
+      - name: publish to the pulse-plus-latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release delete pulse-plus-latest --cleanup-tag --yes || true
+          gh release create pulse-plus-latest "${{ steps.apk.outputs.path }}" \
+            --target "$GITHUB_SHA" \
+            --title "Pulse+ ${{ steps.apk.outputs.version }} (${GITHUB_SHA::7})" \
+            --notes "Built from \`personal\` at ${GITHUB_SHA::7}: $(git log -1 --format=%s). Installs over the previous Pulse+ and keeps its data." \
+            --prerelease

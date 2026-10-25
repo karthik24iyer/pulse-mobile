@@ -19,6 +19,12 @@ alongside the original.
 - Backup and restore (More › Your data › Backup): everything you enter yourself in one JSON file. Restoring merges and
   never deletes, and also reads the Journal JSON export from Pulse Mobile.
 
+## Get the APK
+
+Every push to `personal` builds the APK on GitHub (`.github/workflows/apk.yml`, about 15–20 minutes). Download it from
+the [pulse-plus-latest release](https://github.com/karthik24iyer/pulse-mobile/releases/tag/pulse-plus-latest) (open
+it on the phone and tap the `.apk`), or from the run's Artifacts in the Actions tab.
+
 ## Build an APK (Linux)
 
 Needs Node 20+, pnpm, JDK 17+ and the Android SDK (`ANDROID_HOME` set; Android Studio installs it).
