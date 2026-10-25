@@ -40,6 +40,8 @@
     "fat": "Grasa",
     "glucose": "Glucosa en sangre",
     "core_temp": "Temperatura central",
+    "bp_systolic": "Presión arterial sistólica",
+    "bp_diastolic": "Presión arterial diastólica",
     "swim_strokes": "Brazadas de natación"
   },
   "group": {
@@ -86,6 +88,8 @@
     "fat": "Grasa de la comida registrada en el día, en gramos.",
     "bloodGlucose": "Tu última lectura de glucosa en sangre de un medidor conectado o de un registro manual.",
     "coreTemperature": "Lecturas de temperatura corporal registradas, en grados Celsius.",
+    "bloodPressureSystolic": "Tu presión arterial sistólica (alta) registrada, media del día en mmHg.",
+    "bloodPressureDiastolic": "Tu presión arterial diastólica (baja) registrada, media del día en mmHg.",
     "swimStrokes": "Total de brazadas de natación registradas en las actividades del día.",
     "recoveryTrend": "Puntuaciones diarias de Recovery en el periodo elegido. Las puntuaciones que faltan siguen siendo huecos.",
     "whatShapedIt": "Las mediciones nocturnas que contribuyeron al Recovery de este día, comparadas con tu base.",

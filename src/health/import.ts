@@ -215,6 +215,7 @@ export type ElevationGainedRecord = RecordResult<"ElevationGained">;
 export type HydrationRecord = RecordResult<"Hydration">;
 export type NutritionRecord = RecordResult<"Nutrition">;
 export type BloodGlucoseRecord = RecordResult<"BloodGlucose">;
+export type BloodPressureRecord = RecordResult<"BloodPressure">;
 export type BodyTemperatureRecord = RecordResult<"BodyTemperature">;
 /**
  * The library types it as instantaneous (`time`), but Health Connect's MenstruationPeriodRecord is an interval and the
@@ -247,6 +248,7 @@ export type HealthInput = {
   Hydration?: HydrationRecord[];
   Nutrition?: NutritionRecord[];
   BloodGlucose?: BloodGlucoseRecord[];
+  BloodPressure?: BloodPressureRecord[];
   BodyTemperature?: BodyTemperatureRecord[];
   MenstruationPeriod?: MenstruationPeriodRecord[];
   MenstruationFlow?: MenstruationFlowRecord[];
@@ -650,6 +652,8 @@ export const SOURCE_DAILY_KEYS: Readonly<Record<string, ReadType>> = {
   carbs: "Nutrition",
   fat: "Nutrition",
   glucose: "BloodGlucose",
+  bp_systolic: "BloodPressure",
+  bp_diastolic: "BloodPressure",
   core_temp: "BodyTemperature",
 };
 
@@ -670,6 +674,9 @@ export function* mapDailyValuesSteps(input: HealthInput, tz: string): Steps<Dail
   push(yield* sumPerDay(nutrition, (r) => r.totalFat?.inGrams ?? 0, tz), "fat", round1);
   push(meanPerDay(input.BloodGlucose ?? [], (r) => r.level.inMilligramsPerDeciliter, tz), "glucose", round1);
   push(meanPerDay(input.BodyTemperature ?? [], (r) => r.temperature.inCelsius, tz), "core_temp", round2);
+  // Blood pressure as the day's mean systolic and diastolic, mmHg (an InBody, Omron or similar cuff writes it).
+  push(meanPerDay(input.BloodPressure ?? [], (r) => r.systolic.inMillimetersOfMercury, tz), "bp_systolic", Math.round);
+  push(meanPerDay(input.BloodPressure ?? [], (r) => r.diastolic.inMillimetersOfMercury, tz), "bp_diastolic", Math.round);
   return out.sort((a, b) => a.day.localeCompare(b.day) || a.key.localeCompare(b.key));
 }
 

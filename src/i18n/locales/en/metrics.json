@@ -40,6 +40,8 @@
     "fat": "Fat",
     "glucose": "Blood glucose",
     "core_temp": "Core temperature",
+    "bp_systolic": "Systolic blood pressure",
+    "bp_diastolic": "Diastolic blood pressure",
     "swim_strokes": "Swim strokes"
   },
   "group": {
@@ -86,6 +88,8 @@
     "fat": "Fat in the food logged for the day, in grams.",
     "bloodGlucose": "Your latest blood glucose reading from a connected meter or a manual log.",
     "coreTemperature": "Logged body temperature readings in degrees Celsius.",
+    "bloodPressureSystolic": "Your logged systolic (top) blood pressure, the day's average in mmHg.",
+    "bloodPressureDiastolic": "Your logged diastolic (bottom) blood pressure, the day's average in mmHg.",
     "swimStrokes": "Total swim strokes recorded in the day's activities.",
     "recoveryTrend": "Daily recovery scores over the selected period. Missing scores remain gaps.",
     "whatShapedIt": "The overnight measurements that contributed to this day's recovery, compared with your baseline.",

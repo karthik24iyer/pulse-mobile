@@ -192,6 +192,8 @@
     "fat": "Fat from the food you logged.",
     "glucose": "Blood glucose readings from a connected meter or a manual log.",
     "core_temp": "Core body temperature readings from a connected sensor.",
+    "bp_systolic": "Systolic blood pressure readings from a connected cuff or scale.",
+    "bp_diastolic": "Diastolic blood pressure readings from a connected cuff or scale.",
     "swim_strokes": "Strokes counted during pool swims."
   },
   "metricSource": {

@@ -35,6 +35,8 @@ const DEFS = [
   { key: "fat", unit: "g", format: "int", direction: "neutral", group: "nutrition", partialToday: true },
   { key: "glucose", unit: "mg/dL", format: "int", direction: "neutral", group: "vitals" },
   { key: "core_temp", unit: "°C", format: "decimal1", direction: "neutral", group: "vitals" },
+  { key: "bp_systolic", unit: "mmHg", format: "int", direction: "down", group: "vitals" },
+  { key: "bp_diastolic", unit: "mmHg", format: "int", direction: "down", group: "vitals" },
   { key: "swim_strokes", format: "grouped", direction: "up", group: "activity", partialToday: true },
 ] as const satisfies readonly (Omit<ExtraMetric, "label" | "key"> & { key: LabelKey })[]
 

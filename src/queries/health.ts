@@ -500,6 +500,8 @@ const MEASUREMENTS = [
   { key: "body_fat", unit: "%", format: "decimal1", col: "bodyFatPct", always: true },
   { key: "glucose", unit: "mg/dL", format: "int", col: "glucose", always: false },
   { key: "core_temp", unit: "°C", format: "decimal1", col: "core_temp", always: false },
+  { key: "bp_systolic", unit: "mmHg", format: "int", col: "bp_systolic", always: false },
+  { key: "bp_diastolic", unit: "mmHg", format: "int", col: "bp_diastolic", always: false },
 ] as const;
 
 /** Every reading of each measurement, newest first: a Metrics column, or a daily-values key. */

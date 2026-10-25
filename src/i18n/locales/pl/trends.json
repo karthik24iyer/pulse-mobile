@@ -192,6 +192,8 @@
     "fat": "Tłuszcz z zapisanego jedzenia.",
     "glucose": "Odczyty glukozy we krwi z podłączonego glukometru lub ręcznego zapisu.",
     "core_temp": "Odczyty temperatury głębokiej ciała z podłączonego czujnika.",
+    "bp_systolic": "Odczyty ciśnienia skurczowego z podłączonego ciśnieniomierza lub wagi.",
+    "bp_diastolic": "Odczyty ciśnienia rozkurczowego z podłączonego ciśnieniomierza lub wagi.",
     "swim_strokes": "Ruchy pływackie liczone podczas pływania na basenie."
   },
   "metricSource": {

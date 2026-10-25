@@ -463,6 +463,8 @@ describe("extras and the Fitbit log", () => {
   const mass = (g: number) => ({ inGrams: g, inKilograms: g / 1000, inMilligrams: g * 1000, inMicrograms: g * 1e6, inOunces: g / 28.3495, inPounds: g / 453.592 });
   const glucose = (id: string, time: string, mgdl: number) => ({ metadata: meta(id), time, level: { inMilligramsPerDeciliter: mgdl, inMillimolesPerLiter: mgdl / 18 }, specimenSource: 0, mealType: 0, relationToMeal: 0 });
   const temp = (id: string, time: string, c: number) => ({ metadata: meta(id), time, temperature: { inCelsius: c, inFahrenheit: c * 1.8 + 32 } });
+  const mmHg = (v: number) => ({ inMillimetersOfMercury: v });
+  const bp = (id: string, time: string, sys: number, dia: number) => ({ metadata: meta(id), time, systolic: mmHg(sys), diastolic: mmHg(dia), bodyPosition: 0, measurementLocation: 0 });
   const input = {
     FloorsClimbed: [
       { metadata: meta("f1"), startTime: at("2026-10-02", "10:00:00"), endTime: at("2026-10-02", "10:05:00"), floors: 3 },
@@ -488,10 +490,13 @@ describe("extras and the Fitbit log", () => {
     ],
     BloodGlucose: [glucose("g1", at("2026-10-02", "07:00:00"), 90), glucose("g2", at("2026-10-02", "19:00:00"), 110)],
     BodyTemperature: [temp("t1", at("2026-10-02", "07:00:00"), 36.6), temp("t2", at("2026-10-02", "19:00:00"), 36.9)],
+    BloodPressure: [bp("b1", at("2026-10-02", "08:00:00"), 121, 79), bp("b2", at("2026-10-02", "20:00:00"), 128, 84)],
   };
 
   it("writes the catalogue's keys per local day: sums pro-rated over midnight, spot readings averaged", () => {
     expect(mapRecords(input, TZ).dailyValues).toEqual([
+      { day: "2026-10-02", key: "bp_diastolic", value: 82 },
+      { day: "2026-10-02", key: "bp_systolic", value: 125 },
       { day: "2026-10-02", key: "calories_in", value: 600 },
       { day: "2026-10-02", key: "core_temp", value: 36.75 },
       { day: "2026-10-02", key: "elevation", value: 12.5 },

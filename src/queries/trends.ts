@@ -69,6 +69,8 @@ const EXTRA_GROUP: Record<ExtraKey, TrendGroup> = {
   fat: "nutrition",
   glucose: "vitals",
   core_temp: "vitals",
+  bp_systolic: "vitals",
+  bp_diastolic: "vitals",
 };
 
 /** Export column: the key plus its unit ("distance_km", "glucose_mg_dl"); h:mm metrics export minutes. */

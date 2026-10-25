@@ -40,6 +40,8 @@
     "fat": "Tłuszcz",
     "glucose": "Glukoza we krwi",
     "core_temp": "Temperatura głęboka",
+    "bp_systolic": "Ciśnienie skurczowe",
+    "bp_diastolic": "Ciśnienie rozkurczowe",
     "swim_strokes": "Ruchy pływackie"
   },
   "group": {
@@ -86,6 +88,8 @@
     "fat": "Tłuszcz w jedzeniu zapisanym za dzień, w gramach.",
     "bloodGlucose": "Twój ostatni odczyt glukozy we krwi z połączonego glukometru lub ręcznego wpisu.",
     "coreTemperature": "Zapisane odczyty temperatury ciała w stopniach Celsjusza.",
+    "bloodPressureSystolic": "Zapisane ciśnienie skurczowe (górne), średnia z dnia w mmHg.",
+    "bloodPressureDiastolic": "Zapisane ciśnienie rozkurczowe (dolne), średnia z dnia w mmHg.",
     "swimStrokes": "Łączna liczba ruchów pływackich zapisanych w aktywnościach dnia.",
     "recoveryTrend": "Dzienne wyniki Recovery w wybranym okresie. Brakujące wyniki pozostają lukami.",
     "whatShapedIt": "Nocne pomiary, które wpłynęły na Recovery tego dnia, na tle Twojej bazy.",

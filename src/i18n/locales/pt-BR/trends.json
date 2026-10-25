@@ -192,6 +192,8 @@
     "fat": "Gordura dos alimentos que você registrou.",
     "glucose": "Leituras de glicose no sangue de um medidor conectado ou de um registro manual.",
     "core_temp": "Leituras da temperatura corporal central de um sensor conectado.",
+    "bp_systolic": "Leituras de pressão sistólica de um medidor ou balança conectados.",
+    "bp_diastolic": "Leituras de pressão diastólica de um medidor ou balança conectados.",
     "swim_strokes": "Braçadas contadas durante nados na piscina."
   },
   "metricSource": {

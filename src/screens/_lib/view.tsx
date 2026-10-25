@@ -135,6 +135,8 @@ export const STAT_ICON: Record<string, LucideIcon> = {
   fat: Droplets,
   glucose: Syringe,
   core_temp: ThermometerSun,
+  bp_systolic: Gauge,
+  bp_diastolic: Gauge,
   swim_strokes: Waves,
   weight: Weight,
   body_fat: Percent,

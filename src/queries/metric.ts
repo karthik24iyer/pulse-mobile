@@ -110,6 +110,8 @@ const CONFIG: Record<DetailKey, Config> = {
   fat: { group: "nutrition", sections: ["macros", "entries"] },
   glucose: { group: "vitals", reading: true, baseline: true, sections: ["outliers"] },
   core_temp: { group: "vitals", reading: true, baseline: true, sections: ["outliers"] },
+  bp_systolic: { group: "vitals", reading: true, baseline: true, sections: ["outliers"] },
+  bp_diastolic: { group: "vitals", reading: true, baseline: true, sections: ["outliers"] },
   swim_strokes: { group: "activity", total: true, sections: [] },
 };
 

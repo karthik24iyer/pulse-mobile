@@ -40,6 +40,8 @@
     "fat": "Fett",
     "glucose": "Blutzucker",
     "core_temp": "Kerntemperatur",
+    "bp_systolic": "Systolischer Blutdruck",
+    "bp_diastolic": "Diastolischer Blutdruck",
     "swim_strokes": "Schwimmzüge"
   },
   "group": {
@@ -86,6 +88,8 @@
     "fat": "Fett im für den Tag eingetragenen Essen, in Gramm.",
     "bloodGlucose": "Dein letzter Blutzuckerwert von einem verbundenen Messgerät oder einem manuellen Eintrag.",
     "coreTemperature": "Eingetragene Körpertemperaturwerte in Grad Celsius.",
+    "bloodPressureSystolic": "Dein eingetragener systolischer (oberer) Blutdruck, Tagesmittel in mmHg.",
+    "bloodPressureDiastolic": "Dein eingetragener diastolischer (unterer) Blutdruck, Tagesmittel in mmHg.",
     "swimStrokes": "Gesamte Schwimmzüge, die in den Aktivitäten des Tages erfasst wurden.",
     "recoveryTrend": "Tägliche Recovery-Werte im gewählten Zeitraum. Fehlende Werte bleiben Lücken.",
     "whatShapedIt": "Die nächtlichen Messwerte, die zur Recovery dieses Tages beigetragen haben, im Vergleich zu deiner Basis.",

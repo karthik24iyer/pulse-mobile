@@ -192,6 +192,8 @@
     "fat": "Lipides des aliments que tu as enregistrés.",
     "glucose": "Relevés de glycémie d’un lecteur connecté ou d’un relevé manuel.",
     "core_temp": "Relevés de température corporelle centrale d’un capteur connecté.",
+    "bp_systolic": "Relevés de pression systolique d’un tensiomètre ou d’une balance connectés.",
+    "bp_diastolic": "Relevés de pression diastolique d’un tensiomètre ou d’une balance connectés.",
     "swim_strokes": "Mouvements de nage comptés pendant les séances en piscine."
   },
   "metricSource": {

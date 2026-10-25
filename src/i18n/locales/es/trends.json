@@ -192,6 +192,8 @@
     "fat": "Grasas de la comida que registraste.",
     "glucose": "Lecturas de glucosa en sangre de un medidor conectado o de un registro manual.",
     "core_temp": "Lecturas de temperatura corporal central de un sensor conectado.",
+    "bp_systolic": "Lecturas de presión sistólica de un tensiómetro o báscula conectados.",
+    "bp_diastolic": "Lecturas de presión diastólica de un tensiómetro o báscula conectados.",
     "swim_strokes": "Brazadas contadas durante nados en piscina."
   },
   "metricSource": {

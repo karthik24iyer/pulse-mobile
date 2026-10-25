@@ -54,9 +54,9 @@ export type ChartDef = {
   source?: "workouts";
 };
 
-const LINE = new Set(["hrv", "rhr", "resp", "weight", "body_fat", "avg_hr", "glucose", "core_temp"]);
-const SPARSE = new Set(["weight", "body_fat", "glucose", "core_temp"]);
-const BASELINE = new Set(["hrv", "rhr", "resp", "avg_hr", "glucose", "core_temp"]);
+const LINE = new Set(["hrv", "rhr", "resp", "weight", "body_fat", "avg_hr", "glucose", "core_temp", "bp_systolic", "bp_diastolic"]);
+const SPARSE = new Set(["weight", "body_fat", "glucose", "core_temp", "bp_systolic", "bp_diastolic"]);
+const BASELINE = new Set(["hrv", "rhr", "resp", "avg_hr", "glucose", "core_temp", "bp_systolic", "bp_diastolic"]);
 const DAY_OF: Record<string, DayView> = { rhr: "hr", avg_hr: "hr", strain: "strain", stress: "stress", sleep: "sleep", hours: "sleep", consistency: "sleep" };
 const fixed = (colorBy: ChartColorBy): [number, number] | undefined => (colorBy === "band" ? [0, 100] : colorBy === "stress" ? [0, 100] : undefined);
 

@@ -192,6 +192,8 @@
     "fat": "Grassi del cibo che hai registrato.",
     "glucose": "Letture della glicemia da un misuratore collegato o da un inserimento manuale.",
     "core_temp": "Letture della temperatura corporea centrale da un sensore collegato.",
+    "bp_systolic": "Letture della pressione sistolica da uno sfigmomanometro o bilancia collegati.",
+    "bp_diastolic": "Letture della pressione diastolica da uno sfigmomanometro o bilancia collegati.",
     "swim_strokes": "Bracciate contate durante le nuotate in piscina."
   },
   "metricSource": {

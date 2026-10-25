@@ -40,6 +40,8 @@
     "fat": "Lipides",
     "glucose": "Glycémie",
     "core_temp": "Température centrale",
+    "bp_systolic": "Pression artérielle systolique",
+    "bp_diastolic": "Pression artérielle diastolique",
     "swim_strokes": "Mouvements de nage"
   },
   "group": {
@@ -86,6 +88,8 @@
     "fat": "Lipides des aliments notés pour la journée, en grammes.",
     "bloodGlucose": "Ta dernière mesure de glycémie depuis un lecteur connecté ou une saisie manuelle.",
     "coreTemperature": "Mesures de température corporelle notées en degrés Celsius.",
+    "bloodPressureSystolic": "Pression systolique (haute) notée, moyenne du jour en mmHg.",
+    "bloodPressureDiastolic": "Pression diastolique (basse) notée, moyenne du jour en mmHg.",
     "swimStrokes": "Total des mouvements de nage enregistrés dans les activités du jour.",
     "recoveryTrend": "Scores de Recovery quotidiens sur la période choisie. Les scores manquants restent des trous.",
     "whatShapedIt": "Les mesures de la nuit qui ont contribué à la Recovery de ce jour, comparées à ta base.",

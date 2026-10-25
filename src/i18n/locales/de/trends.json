@@ -192,6 +192,8 @@
     "fat": "Fett aus dem Essen, das du erfasst hast.",
     "glucose": "Blutzuckerwerte von einem verbundenen Messgerät oder einem manuellen Eintrag.",
     "core_temp": "Kerntemperaturwerte von einem verbundenen Sensor.",
+    "bp_systolic": "Systolische Blutdruckwerte von einem verbundenen Messgerät.",
+    "bp_diastolic": "Diastolische Blutdruckwerte von einem verbundenen Messgerät.",
     "swim_strokes": "Beim Schwimmen im Becken gezählte Züge."
   },
   "metricSource": {

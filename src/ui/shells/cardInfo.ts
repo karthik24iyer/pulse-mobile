@@ -39,6 +39,8 @@ const INFO_KEY = {
   "Fat": "fat",
   "Blood glucose": "bloodGlucose",
   "Core temperature": "coreTemperature",
+  "Systolic blood pressure": "bloodPressureSystolic",
+  "Diastolic blood pressure": "bloodPressureDiastolic",
   "Swim strokes": "swimStrokes",
   "Recovery trend": "recoveryTrend",
   "What shaped it": "whatShapedIt",

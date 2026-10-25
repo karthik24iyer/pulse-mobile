@@ -88,6 +88,7 @@
     "Hydration": "hydration",
     "Nutrition": "nutrition",
     "BloodGlucose": "blood glucose",
+    "BloodPressure": "blood pressure",
     "BodyTemperature": "body temperature",
     "MenstruationPeriod": "menstruation period",
     "MenstruationFlow": "menstruation flow",

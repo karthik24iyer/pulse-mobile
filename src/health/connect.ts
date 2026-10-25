@@ -42,6 +42,7 @@ export const READ_TYPES = [
   "Hydration",
   "Nutrition",
   "BloodGlucose",
+  "BloodPressure",
   "BodyTemperature",
   "MenstruationPeriod",
   "MenstruationFlow",
