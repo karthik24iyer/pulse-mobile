@@ -680,13 +680,16 @@ const MONITOR_FIELD = { restingHr: "rhr", hrv: "hrv", resp: "resp", spo2: "spo2"
 export function engineMonitor(f: Fold, row: HealthMonitorRow): HealthMonitorRow {
   if (row.reason !== null) return row;
   const nights = f.monitorRows.slice(-MONITOR_WINDOW);
-  // No SpO2: Fitbit does not write it to Health Connect, so it is left out rather than shown empty.
-  const vitals = row.vitals.filter((v) => v.key !== "spo2").map((v) => {
+  // SpO2 only when some app wrote it in the window: Fitbit does not write it to Health Connect, so for most people it
+  // is left out rather than shown empty.
+  const hasSpo2 = nights.some((n) => n.spo2 != null && Number.isFinite(n.spo2));
+  const vitals = row.vitals.filter((v) => v.key !== "spo2" || hasSpo2).map((v) => {
     const xs = nights.map((n) => n[MONITOR_FIELD[v.key]]).filter((x): x is number => x != null && Number.isFinite(x));
     const s = popStats(xs);
     const range = s && { low: roundHalfAway(s.mean - s.sd, 2), high: roundHalfAway(s.mean + s.sd, 2) };
+    // Judged against the rounded band it shows, so a reading equal to a shown bound is never called out of range.
     const status: typeof v.status =
-      v.value == null || !s ? "no_data" : s.sd === 0 ? "in_range" : v.value < s.mean - s.sd ? "low" : v.value > s.mean + s.sd ? "high" : "in_range";
+      v.value == null || !range ? "no_data" : s.sd === 0 ? "in_range" : v.value < range.low ? "low" : v.value > range.high ? "high" : "in_range";
     return { ...v, range, rangeSource: "pulse" as const, status };
   });
   return {

@@ -245,7 +245,7 @@ describe("parity with the web app", () => {
     // which tempers a few days' scores (the seeded illness's 2026-08-03 scores 51 where it scored 69). The web's
     // value was "3a2163c7f92d4dab".
     // Version 29: HRV and resting HR are Fitbit's, the values every screen shows. Version 28's value was "47289fc792ec11ef".
-    "daily_scores.health_monitor": "4d132dadfd15bf77",
+    "daily_scores.health_monitor": "c22375dd40dee97b",
     // Mobile rebuilds Pulse Age on WHOOP's Healthspan method (src/core/algorithms/healthspan.ts): 6.0 years per ln HR
     // (WHOOP's 10 × an overlap factor of 0.6) with no 9/n rescaling (a missing term counts 0), WHOOP's references and
     // curves (sleep from 7 h, Arem and Ahmadi zone curves, strength flat after 40 min, lean mass as body fat %), zone time
@@ -407,7 +407,7 @@ describe("the last 30 days", () => {
     expect(Math.min(...efforts)).toBeGreaterThanOrEqual(0); // a rest day can sit at 0
   });
 
-  it("have Health Monitor's four vitals on every night with data (no SpO2: Health Connect has none)", () => {
+  it("have Health Monitor's vitals on every night with data, SpO2 included when the night has it", () => {
     for (const d of last30()) {
       const hm = col(d, "health_monitor");
       if (bandOffNights.includes(d)) {
@@ -415,7 +415,7 @@ describe("the last 30 days", () => {
         continue;
       }
       if (hm.reason !== null) throw new Error(`${d}: ${hm.reason}`);
-      expect(hm.vitals.map((v) => v.key).sort()).toEqual(["hrv", "resp", "restingHr", "skinTempDev"]);
+      expect(hm.vitals.map((v) => v.key).sort()).toEqual(["hrv", "resp", "restingHr", "skinTempDev", "spo2"]);
     }
   });
 

@@ -31,7 +31,7 @@ import {
   daySpansOf,
   exercisesBetween,
 } from "./common";
-import { illnessRaised, VITAL_LABEL } from "./home";
+import { illnessRaised, monitorTotal, VITAL_LABEL } from "./home";
 import { zoneBounds, zoneNote, zoneRows } from "./strain";
 import type {
   ChipTone,
@@ -78,7 +78,7 @@ export async function getHealthHub(ctx: QueryCtx): Promise<HealthHubVM> {
     day: today,
     healthspan: hs.value ? ok({ pulseAge: hs.value.pulseAge, deltaYears: hs.value.deltaYears, pace: hs.value.pace, paceDelta: prevPace == null || hs.value.pace == null ? null : hs.value.pace - prevPace }, hs.provisional) : none(hs.reason ?? "no_data", hs.nightsLeft),
     monitor: monitor.count.value
-      ? ok({ vitals: monitor.vitals.map((v) => ({ key: v.key, short: v.short, status: v.status })), inRange: monitor.count.value.inRange, total: VITALS.length })
+      ? ok({ vitals: monitor.vitals.map((v) => ({ key: v.key, short: v.short, status: v.status })), inRange: monitor.count.value.inRange, total: monitor.count.value.total })
       : none(monitor.count.reason ?? "no_data"),
     stress:
       st && st.average != null
@@ -373,6 +373,8 @@ const VITALS: { key: VitalKey; short: string; unit: string; signed?: boolean; pi
   { key: "restingHr", short: "RHR", unit: "bpm", pick: (r) => r.rhr },
   { key: "hrv", short: "HRV", unit: "ms", pick: (r) => r.metrics?.hrvMs },
   { key: "skinTempDev", short: "Temp", unit: "°C", signed: true, pick: (r) => r.recovery?.inputs.skinTempDev },
+  // Shown only when the night's monitor judged it (some app wrote SpO2; Fitbit doesn't).
+  { key: "spo2", short: "SpO₂", unit: "%", pick: (r) => r.metrics?.spo2Pct },
 ];
 
 const num = (v: number, dp: number, signed = false) => {
@@ -391,7 +393,8 @@ export async function getMonitor(day: string, ctx: QueryCtx, preloaded?: Map<str
   ]);
   const row = rows.get(day);
   const hm = row?.healthMonitor;
-  const vitals: Vital[] = VITALS.map((v) => {
+  const shown = VITALS.filter((v) => v.key !== "spo2" || (hm && hm.reason === null && hm.vitals.some((x) => x.key === "spo2")));
+  const vitals: Vital[] = shown.map((v) => {
     const reading = hm && hm.reason === null ? hm.vitals.find((x) => x.key === v.key) : undefined;
     // The value Health Monitor judged, so the number, its chip and the count agree; the day's own reading only where
     // the monitor had none (no status then).
@@ -434,7 +437,7 @@ export async function getMonitor(day: string, ctx: QueryCtx, preloaded?: Map<str
   else if (hm.reason !== null) count = none(nightReason(hm.reason, isToday));
   else {
     const raised = illnessRaised(hm);
-    count = ok({ inRange: hm.inRange, total: VITALS.length, outOfRange: hm.flagged, status: raised ? "illness" : hm.flagged ? "out" : "within" });
+    count = ok({ inRange: hm.inRange, total: monitorTotal(hm), outOfRange: hm.flagged, status: raised ? "illness" : hm.flagged ? "out" : "within" });
   }
   return {
     day,

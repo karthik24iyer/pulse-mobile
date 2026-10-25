@@ -227,11 +227,17 @@ function monitorAlert(row: DayRow | undefined): HomeVM["monitorAlert"] {
   return { kind: illness ? "illness" : "flagged", count: flagged.length, names: flagged.map((v) => VITAL_LABEL[v.key]) };
 }
 
+/**
+ * How many vitals the monitor could judge last night: the ones with a reading, so a type the phone never records
+ * (skin temperature on an older Health Connect, SpO2 from Fitbit) doesn't leave the count stuck at 3/4.
+ */
+export const monitorTotal = (hm: { vitals: { status: string }[] }) => hm.vitals.filter((v) => v.status !== "no_data").length || hm.vitals.length;
+
 function monitorSummary(row: DayRow | undefined, isToday: boolean): HomeVM["monitor"] {
   const hm = row?.healthMonitor;
   if (!hm) return none(isToday ? "awaiting_sleep_sync" : "band_not_worn");
   if (hm.reason !== null) return none(nightReason(hm.reason, isToday));
-  return ok({ inRange: hm.inRange, total: hm.vitals.length, flagged: hm.flagged });
+  return ok({ inRange: hm.inRange, total: monitorTotal(hm), flagged: hm.flagged });
 }
 
 /** `series` is the day's stored energy_bank minute series (loadSeries), fetched by the caller alongside its other reads. */
