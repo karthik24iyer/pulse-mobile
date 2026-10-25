@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pulse_widget_heart_strain_name">Heart rate &amp; strain</string>
+    <string name="pulse_widget_heart_strain_description">Your latest heart rate beside today\'s strain</string>
+    <string name="pulse_widget_fuel_name">Water &amp; calories</string>
+    <string name="pulse_widget_fuel_description">Today\'s water beside today\'s calories eaten</string>
+</resources>

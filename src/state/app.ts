@@ -16,6 +16,7 @@ import { memoStore } from "@/data/memo";
 import { seedDemo } from "@/data/seed";
 import type { Store } from "@/data/store";
 import type { Profile, SyncState } from "@/data/types";
+import { publishWidgets } from "@/widgets/publish";
 import { askPermissions, availability, permissionState, type Availability, type PermissionState } from "@/health/connect";
 import { initI18n, type LanguageChoice } from "@/i18n/config";
 import { localeFor, readChoice, resolveChoice, saveChoice } from "@/i18n/language";
@@ -101,6 +102,21 @@ const versionListeners = new Set<() => void>();
 export function dataChanged() {
   version++;
   for (const l of versionListeners) l();
+  scheduleWidgets();
+}
+
+/** A log, an edit or a sync changed the data: redraw the home-screen widgets once things settle (1 s). */
+let widgetTimer: ReturnType<typeof setTimeout> | null = null;
+function scheduleWidgets() {
+  if (widgetTimer) clearTimeout(widgetTimer);
+  widgetTimer = setTimeout(() => {
+    widgetTimer = null;
+    try {
+      void publishWidgets(queryCtx());
+    } catch {
+      // Before onboarding there is nothing to show.
+    }
+  }, 1000);
 }
 const subscribeVersion = (l: () => void) => {
   versionListeners.add(l);

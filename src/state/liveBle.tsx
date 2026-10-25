@@ -4,6 +4,7 @@
 //
 // Display-only: nothing here writes to SQLite. Health Connect stays the scoring source (no double counting).
 import * as React from "react";
+import { endLiveHeart, publishLiveHeart } from "@/widgets/publish";
 import { liveBle, type BlePermission, type BleSnapshot, type LiveSample } from "@/health/ble";
 import { rmssd as rmssdOf, RR_WINDOW_MS, since, stampRr, TRACE_MS, type RrBeat } from "@/health/bleHr";
 
@@ -94,6 +95,7 @@ export function LiveBleProvider({ children }: { children: React.ReactNode }) {
       if (timer) clearTimeout(timer);
       timer = null;
       setData(EMPTY);
+      endLiveHeart();
     });
     const off = liveBle.onSample((s: LiveSample) => {
       const r = raw.current;
@@ -101,6 +103,7 @@ export function LiveBleProvider({ children }: { children: React.ReactNode }) {
         r.history.push({ t: s.t, bpm: s.bpm });
         r.bpm = s.bpm;
         r.lastBeatAt = s.t;
+        publishLiveHeart(s.bpm, s.t);
       }
       if (s.rrMs.length) r.beats.push(...stampRr(s.rrMs, s.t));
       r.contact = s.contact;

@@ -24,6 +24,11 @@ class PulseBtModule : Module() {
     Function("openApp") { pkg: String -> open(pkg) }
 
     Function("healthFeatures") { healthFeatures() }
+
+    Function("updateWidgets") { json: String ->
+      appContext.reactContext?.let { PulseWidgets.save(it.applicationContext, json) }
+      Unit
+    }
   }
 
   /**

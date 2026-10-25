@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A 2x1 Pulse widget: two cells side by side (label, value, caption), split by a thin rule. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pulse_widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/pulse_widget_bg"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:id="@+id/cell_left"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp">
+
+        <TextView
+            android:id="@+id/label_left"
+            style="@style/PulseWidgetLabel" />
+
+        <TextView
+            android:id="@+id/value_left"
+            style="@style/PulseWidgetValue" />
+
+        <TextView
+            android:id="@+id/caption_left"
+            style="@style/PulseWidgetCaption" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
+        android:background="@color/pulse_widget_rule"
+        android:importantForAccessibility="no" />
+
+    <LinearLayout
+        android:id="@+id/cell_right"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp">
+
+        <TextView
+            android:id="@+id/label_right"
+            style="@style/PulseWidgetLabel" />
+
+        <TextView
+            android:id="@+id/value_right"
+            style="@style/PulseWidgetValue" />
+
+        <TextView
+            android:id="@+id/caption_right"
+            style="@style/PulseWidgetCaption" />
+    </LinearLayout>
+</LinearLayout>

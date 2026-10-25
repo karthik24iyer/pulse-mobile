@@ -7,6 +7,7 @@ type Native = {
   bondedDevices(): { id: string; name: string | null }[];
   openApp(pkg: string): boolean;
   healthFeatures(): HealthFeatures | null;
+  updateWidgets(json: string): void;
 };
 const native = requireOptionalNativeModule<Native>("PulseBt");
 
@@ -34,5 +35,14 @@ export function healthFeatures(): HealthFeatures | null {
     return native?.healthFeatures() ?? null;
   } catch {
     return null;
+  }
+}
+
+/** Saves the widgets' snapshot (src/widgets/snapshot.ts, as JSON) and redraws every placed Pulse widget. */
+export function updateWidgets(json: string): void {
+  try {
+    native?.updateWidgets(json);
+  } catch {
+    // No widget placed, or no native module: nothing to draw.
   }
 }

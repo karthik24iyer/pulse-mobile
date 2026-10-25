@@ -3,4 +3,26 @@
   <queries>
     <package android:name="com.fitbit.FitbitMobile" />
   </queries>
+
+  <application>
+    <!-- The two 2x1 home-screen widgets (java/app/pulse/bt/PulseWidgets.kt). -->
+    <receiver
+        android:name="app.pulse.bt.HeartStrainWidget"
+        android:exported="false"
+        android:label="@string/pulse_widget_heart_strain_name">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/pulse_widget_heart_strain" />
+    </receiver>
+    <receiver
+        android:name="app.pulse.bt.FuelWidget"
+        android:exported="false"
+        android:label="@string/pulse_widget_fuel_name">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/pulse_widget_fuel" />
+    </receiver>
+  </application>
 </manifest>

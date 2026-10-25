@@ -12,6 +12,7 @@ import { timed } from "@/lib/perf";
 import { localDay } from "@/lib/time";
 import { setForeground } from "@/lib/yield";
 import { runPipeline } from "@/pipeline";
+import { publishFromStore } from "@/widgets/publish";
 import { notifyAfterRun } from "./alerts";
 import { maintainStorage } from "./maintenance";
 import { releaseLock, takeLock, waitForLock, type RunOwner } from "./lock";
@@ -104,6 +105,8 @@ async function run(store: Store, profile: Profile, source: Source, opts: RunSync
   } finally {
     await releaseLock(opts.owner);
     await notifyAfterRun(store, opts.timeZone);
+    // The home-screen widgets read what this run stored (the background task's runs included).
+    await publishFromStore(store, profile);
   }
 }
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 2 columns x 1 row. updatePeriodMillis (Android's 30 min floor) blanks yesterday's daily values after midnight. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="110dp"
+    android:minHeight="40dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="1"
+    android:maxResizeWidth="320dp"
+    android:maxResizeHeight="120dp"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/pulse_widget_pair"
+    android:previewLayout="@layout/pulse_widget_pair"
+    android:description="@string/pulse_widget_fuel_description"
+    android:widgetCategory="home_screen" />

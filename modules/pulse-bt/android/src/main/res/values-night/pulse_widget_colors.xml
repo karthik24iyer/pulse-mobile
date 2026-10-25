@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pulse's dark palette (global.css): card, foreground, muted foreground, border. -->
+<resources>
+    <color name="pulse_widget_bg">#232629</color>
+    <color name="pulse_widget_text">#FFFFFF</color>
+    <color name="pulse_widget_muted">#A9AEB3</color>
+    <color name="pulse_widget_rule">#1AFFFFFF</color>
+</resources>
