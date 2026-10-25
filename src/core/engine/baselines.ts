@@ -93,5 +93,6 @@ export function calibrated(firstDay: number, lastDay: number, dataDays: number, 
   return dataDays >= 5 && firstDay + spanDays <= lastDay;
 }
 
-export const RECOVERY_CALIBRATION_DAYS = 60;
+/** Recovery's calibration span: 30 days in Pulse+ (the study's 60), matching its 30-night HRV and resting-HR baselines. */
+export const RECOVERY_CALIBRATION_DAYS = 30;
 export const STRESS_CALIBRATION_DAYS = 30;

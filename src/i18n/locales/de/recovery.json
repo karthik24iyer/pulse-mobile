@@ -32,6 +32,7 @@
     "skinWarmer": "Hauttemperatur wärmer als üblich",
     "skinCooler": "Hauttemperatur kühler als üblich",
     "hrvBelow": "HRV unter der Baseline",
+    "hrvHigh": "HRV ungewöhnlich hoch: kann auf hartes Training oder eine beginnende Krankheit folgen",
     "atBaseline": "{{subject}} auf Baseline",
     "slightlyAbove": "{{subject}} leicht über der Baseline",
     "slightlyBelow": "{{subject}} leicht unter der Baseline",

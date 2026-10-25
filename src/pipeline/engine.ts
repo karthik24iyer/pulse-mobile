@@ -9,7 +9,7 @@ import { arms, effect, MIN_DAYS } from "@/core/engine/journal";
 import { type SleepPlan, sleepPlan } from "@/core/algorithms/sleepPlanner";
 import type { ChargeDriver, ChargeDriverVerdict } from "@/core/scoring/drivers";
 import { band } from "@/core/scoring/recovery";
-import { type Agg, baseline, calibrated, chanMerge, mergeHist, RECOVERY_CALIBRATION_DAYS, STRESS_CALIBRATION_DAYS } from "@/core/engine/baselines";
+import { type Agg, baseline, calibrated, chanMerge, dailyPool, mergeHist, RECOVERY_CALIBRATION_DAYS, STRESS_CALIBRATION_DAYS } from "@/core/engine/baselines";
 import { timeline } from "@/core/engine/context";
 import { DEFAULT_SLEEP_GOAL_HOURS, POOLING } from "@/core/engine/days";
 import { awakeSeconds, type Drain, energyBand, energyStep, WARMUP_DAYS } from "@/core/engine/energyBank";
@@ -37,7 +37,8 @@ import type { BaselineSummary, CardioLoadRow, EnergyBankRow, HealthMonitorRow, H
 
 /**
  * Aggregates kept per day for the baselines (oldest first, at most BASELINE_DAYS). `restingHRV` and `restingHR` are the
- * night's Fitbit HRV and the day's resting HR (dayRestingHr) as single values, as `resp` and `temp` are.
+ * night's deep-sleep HRV in ln(ms) and its quiet-window heart rate (Pulse+, version 31) as single values, as `resp` and
+ * `temp` are.
  */
 type DayAggRow = { restingHRV: Agg | null; averageHRV: Agg | null; restingHR: Agg | null; inactiveHR: Agg | null; resp: Agg | null; temp: Agg | null };
 
@@ -177,22 +178,47 @@ export function engineSleepRow(row: SleepRow, s: EngineSleep): SleepRow {
 const summary = (b: Agg | null, ok: boolean): BaselineSummary =>
   b && { mean: roundHalfAway(b.avg, 2), sd: roundHalfAway(b.sd, 3), status: ok ? "trusted" : "provisional", nValid: b.count };
 
+/** Nights Recovery's HRV and resting-HR baselines look back over, and how many of them need a value (Pulse+). */
+export const RECOVERY_BASELINE_NIGHTS = 30;
+export const RECOVERY_MIN_NIGHTS = 14;
+
+/**
+ * Recovery's HRV (ln ms) or resting-HR baseline: population mean and SD of the last RECOVERY_BASELINE_NIGHTS nights' values,
+ * null with fewer than RECOVERY_MIN_NIGHTS of them (the HRV-monitoring studies' ~4-week normal range: Vesterinen 2016,
+ * Javaloyes 2019).
+ */
+function recoveryBaseline(xs: readonly (Agg | null)[]): { base: Agg | null; nights: number } {
+  const vals = xs.slice(-RECOVERY_BASELINE_NIGHTS).filter((x): x is Agg => x != null);
+  return { base: vals.length >= RECOVERY_MIN_NIGHTS ? dailyPool(vals) : null, nights: vals.length };
+}
+
+/** HRV more than this many SDs above baseline is noted in the drivers (it can follow hard training or illness), never scored down. */
+const HRV_HIGH_Z = 2;
+
+/** The night's resting HR for Recovery: the mean heart rate in its quiet window (stage 1), null without one. */
+const quietHr = (d: Day) => d.s1.engine?.quiet?.hr ?? null;
+
 /** Recovery for day D, on the shape halo's RecoveryRow has. */
 export function scoreEngineRecovery(f: Fold, d: Day, sleep: EngineSleep): RecoveryRow {
   const e = f.engine;
   const pool = (k: keyof DayAggRow) => baseline(e.aggs.map((x) => x[k]), POOLING[k]);
-  const base = { hrv: pool("restingHRV"), rhr: pool("restingHR"), resp: pool("resp"), temp: pool("temp") };
-  // Fitbit's values are the source of truth: HRV is the night's Fitbit reading (the import's mean of its records in the
-  // main sleep) and resting HR the day's (dayRestingHr: Fitbit's daily value), not the study's own aggregates of the
-  // night's samples, so Recovery, Health Monitor and every screen judge and show the numbers the Fitbit app shows.
+  const hrvB = recoveryBaseline(e.aggs.map((x) => x.restingHRV));
+  const rhrB = recoveryBaseline(e.aggs.map((x) => x.restingHR));
+  const base = { hrv: hrvB.base, rhr: rhrB.base, resp: pool("resp"), temp: pool("temp") };
+  // Pulse+ (version 31): HRV is the night's deep-sleep HRV (the import keeps it as the nightly value, from Fitbit's own
+  // readings) and resting HR the mean heart rate in the same window, so both describe the same quiet stretch of sleep.
+  // The HRV baseline is in ln(ms).
   const hrv = d.dm?.hrvMs ?? null;
-  const rhr = d.rhr;
+  const rhr = quietHr(d);
   const resp = d.dm?.respBpm ?? null;
   const temp = tempDelta(d);
   const r = recovery({ hrv, hrvBase: base.hrv, rhr, rhrBase: base.rhr, sleepScore: sleep.score, resp, respBase: base.resp, temp, tempBase: base.temp });
+  // Off the deep-sleep window (too little deep sleep, or an unstaged night) the score is shown as provisional.
+  const q = d.s1.engine?.quiet;
+  const offDeep = q != null && (q.hrvWindow !== "deep" || q.hrWindow !== "deep");
   const today = daysBetween("1970-01-01", d.day);
   const first = e.recoveryFirst ?? today;
-  const ok = r.value != null && calibrated(first, today, e.recoveryDays + 1, RECOVERY_CALIBRATION_DAYS);
+  const ok = r.value != null && !offDeep && calibrated(first, today, e.recoveryDays + 1, RECOVERY_CALIBRATION_DAYS);
   let reason: ReasonCode | null = null;
   let nightsLeft: number | undefined;
   if (r.value == null) {
@@ -201,7 +227,7 @@ export function scoreEngineRecovery(f: Fold, d: Day, sleep: EngineSleep): Recove
     else if (r.missing.includes("hrv")) reason = "no_hrv_last_night";
     else if (r.missing.includes("hrvBaseline") || r.missing.includes("rhrBaseline")) {
       reason = "calibrating";
-      nightsLeft = 1;
+      nightsLeft = Math.max(1, RECOVERY_MIN_NIGHTS - Math.min(hrvB.nights, rhrB.nights));
     } else reason = "no_data";
   } else {
     if (e.recoveryFirst == null) e.recoveryFirst = today;
@@ -226,13 +252,19 @@ export function scoreEngineRecovery(f: Fold, d: Day, sleep: EngineSleep): Recove
       sleepPerf: sleep.score == null ? null : roundHalfAway(sleep.score / 100, 3),
       skinTempDev: temp == null ? null : roundHalfAway(temp, 2),
     },
-    baselines: { hrv: summary(base.hrv, ok), rhr: summary(base.rhr, ok), resp: summary(base.resp, ok), skinTemp: summary(base.temp, ok) },
-    hrvZ: hrv != null && base.hrv && base.hrv.sd > 0 ? roundHalfAway((hrv - base.hrv.avg) / base.hrv.sd, 2) : null,
+    baselines: { hrv: summary(lnToMs(base.hrv), ok), rhr: summary(base.rhr, ok), resp: summary(base.resp, ok), skinTemp: summary(base.temp, ok) },
+    hrvZ: hrv != null && hrv > 0 && base.hrv && base.hrv.sd > 0 ? roundHalfAway((Math.log(hrv) - base.hrv.avg) / base.hrv.sd, 2) : null,
     drivers: r.value == null ? [] : drivers(r, { hrv, rhr, resp, temp, sleep: sleep.score }, base, mean(e.sleepScores)),
     forecast: null,
     forecastNightsLeft: Math.max(0, 14 - f.recoveries.length),
   };
 }
+
+/**
+ * An ln(ms) baseline in ms for the screens: its geometric mean, and the spread that is ±1 SD on the log scale around it
+ * (to first order, mean × SD).
+ */
+const lnToMs = (b: Agg | null): Agg | null => b && { avg: Math.exp(b.avg), sd: Math.exp(b.avg) * b.sd, count: b.count };
 
 /** Last night's skin-temperature delta, °C: Health Connect's nightly reading against its own baseline (fix 10). */
 const tempDelta = (d: Day) => (d.dm?.nightlyTempC == null ? null : d.dm.nightlyTempC - (d.dm.tempBaselineC ?? 0));
@@ -257,7 +289,10 @@ function drivers(
   const out: ChargeDriver[] = [];
   if (cur.hrv != null && base.hrv) {
     const p = pts((r.parts.hrv - 50) * 0.4);
-    out.push({ label: "HEART_RATE_VARIABILITY", deltaPoints: p, value: roundHalfAway(cur.hrv, 1), baseline: roundHalfAway(base.hrv.avg, 1), unit: "MILLISECONDS", verdict: verdict(p, cur.hrv > base.hrv.avg) });
+    const usual = Math.exp(base.hrv.avg);
+    // Well above the normal band: noted (it can follow hard training or the start of an illness), not scored down.
+    const v: ChargeDriverVerdict = r.hrvZ > HRV_HIGH_Z ? "HRV_UNUSUALLY_HIGH" : verdict(p, cur.hrv > usual);
+    out.push({ label: "HEART_RATE_VARIABILITY", deltaPoints: p, value: roundHalfAway(cur.hrv, 1), baseline: roundHalfAway(usual, 1), unit: "MILLISECONDS", verdict: v });
   }
   if (cur.rhr != null && base.rhr) {
     const p = pts((r.parts.rhr - 50) * 0.3);
@@ -293,9 +328,10 @@ export function foldEngineDay(f: Fold, d: Day, s: EngineSleep, strain: number | 
   const a = d.s1.engine;
   const temp = tempDelta(d);
   push(e.aggs, {
-    restingHRV: d.dm?.hrvMs == null ? null : { avg: d.dm.hrvMs, sd: 0, count: 1 },
+    // Recovery's baselines (Pulse+): the night's deep-sleep HRV in ln(ms) and its quiet-window heart rate.
+    restingHRV: d.dm?.hrvMs == null || !(d.dm.hrvMs > 0) ? null : { avg: Math.log(d.dm.hrvMs), sd: 0, count: 1 },
     averageHRV: a?.averageHRV ?? null,
-    restingHR: d.rhr == null ? null : { avg: d.rhr, sd: 0, count: 1 },
+    restingHR: quietHr(d) == null ? null : { avg: quietHr(d)!, sd: 0, count: 1 },
     inactiveHR: a?.inactiveHR ?? null,
     resp: d.dm?.respBpm == null ? null : { avg: d.dm.respBpm, sd: 0, count: 1 },
     temp: temp == null ? null : { avg: temp, sd: 0, count: 1 },

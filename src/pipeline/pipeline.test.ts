@@ -61,6 +61,8 @@ let store: CountingStore;
 let rows: Map<string, ScoreRow>;
 let allDays: string[];
 let result: { days: number; stage1Reran: number };
+/** Recovery's resting HR as it stores it (1 dp), from stage 1's quiet-window heart rate. */
+const roundHr = (x: number | null | undefined) => (x == null ? null : Math.sign(x) * Math.round(Math.abs(x) * 10) / 10);
 const col = <K extends keyof ScoreRow>(day: string, k: K): NonNullable<ScoreRow[K]> => {
   const v = rows.get(day)?.[k];
   if (v == null) throw new Error(`${day}.${k} is null`);
@@ -178,7 +180,8 @@ describe("parity with the web app", () => {
     // 28: Pulse Age's steps are the day's count. Version 27's value was "bfc30f8718e6d5cb".
     // Version 29: Fitbit's HRV and resting HR are every vital's source of truth. Version 28's value was "32eeb5d9e23357a3".
     // 30: Pulse Age's VO2 max falls back to the estimate (the seed has Fitbit's, so only the version moves). Version 29's value was "22839852f7ee4661".
-    "daily_scores.scoring_version": "25a36d10947fc464",
+    // 31 (Pulse+): Recovery on the deep-sleep window and the ±0.5 SD band (recovery.ts, quietWindow.ts). Version 30's value was "25a36d10947fc464".
+    "daily_scores.scoring_version": "9d8a77fc84882991",
     // Version 15: Activity Strain is the session's Banister TRIMP plus its muscular load through 5.05 · ln(1 + 0.09 · T)
     // (a seeded 45-minute strength session goes from 8.2 to 9.9 on 0–21), each activity stores its `cardioTrimp` and
     // `muscularTrimp`, and its zone seconds count Zone 1 from 40 % of the reserve. Version 14's value was "cb2d75373aaf4d20".
@@ -196,7 +199,9 @@ describe("parity with the web app", () => {
     // Scores move 2.1 points on average, 7.4 at most (today's 78.3 → 79.0); over the seed the mean is 59.3 with 15 % red
     // and 41 % green (was 58.6, 14 %, 37 %). Version 16's value was "238d071f788df5f8".
     // Version 29: HRV and resting HR are Fitbit's nightly HRV and the day's resting HR (dayRestingHr), baselines pooled from them. Version 28's value was "b3aa02f4aeed76aa".
-    "daily_scores.recovery": "d3b2d626013150ba",
+    // Version 31 (Pulse+): resting HR is the night's quiet-window heart rate, HRV is judged on ln(ms), both through the
+    // ±0.5 SD band against 30 nights (at least 14), and a night off the deep-sleep window is provisional. Version 30's value was "d3b2d626013150ba".
+    "daily_scores.recovery": "d66504117abaac16",
     // Version 16: Sleep Performance is WHOOP's 2025 four parts (hours against the night's full need, WHOOP-style 4-day
     // consistency, efficiency against 95 %, 100 − Sleep Stress) with restorative sleep left out; rows gain `parts`,
     // `needMin`, `stressPct` and the night's `latencyMin`, `consistency` is the 4-day measure (SRI stays in `sri`), and debt
@@ -213,7 +218,8 @@ describe("parity with the web app", () => {
     // ratio is livelier (0.47–1.92 over the seed, was 0.64–1.29; today's 1.02 → 0.99), and on Garmin's 0.8 / 1.5 / 2.0
     // bands 17 days read building fast where none did. Version 17's value was "2f0b3f43cfc8014c".
     // Version 29: follows the Recovery and HRV it reads. Version 28's value was "2ef71bc826258214".
-    "daily_scores.training_load": "cb6a9f40c045d6ab",
+    // Version 31: moves with Recovery (its readiness reads it). Version 30's value was "cb6a9f40c045d6ab".
+    "daily_scores.training_load": "a9c96d32d0e7586b",
     // Follows the ACWR above (the target reads the day before's): 2026-09-11 to 09-14 are no longer "lifted" for a
     // ramping-down load. The web's value was "bfcfd859e9c7dd75". Version 15: the target's base is the 28-day mean of the
     // recalibrated Strain (today's range 6.8–8.8 → 9.2–11.4). Version 14's value was "75e4cf7d163079e5".
@@ -224,7 +230,8 @@ describe("parity with the web app", () => {
     // Version 18: the cap reads Garmin's ratio, from 1.5 (was 1.3), and the lift under 0.8 fires on the livelier ratio:
     // 42 days' ranges move (today's 9.2–11.4 is unchanged). Version 17's value was "58d9671c01a08352".
     // Version 29: follows Recovery. Version 28's value was "a2f03bec24de4bfb".
-    "daily_scores.strain_target": "1c4d8fff1ac51dd9",
+    // Version 31: moves with Recovery (Target Strain's recovery factor). Version 30's value was "1c4d8fff1ac51dd9".
+    "daily_scores.strain_target": "c61fcf4fd8b8134c",
     // Version 15: the planner's strain term reads the recalibrated Effort against its 28-day mean (2026-10-01's need 506 →
     // 502 minutes). Version 14's value was "bf57a92ddfecd8e0".
     // Version 16: need = baseline + WHOOP's patented strain sigmoid + half the debt (at most an hour) − naps, in 6.5–11 h,
@@ -298,7 +305,8 @@ describe("parity with the web app", () => {
     // Version 18: the training balance is the period's last Garmin ratio, banded at 0.8 / 1.5 / 2.0. Version 17's was
     // "60efbad5a80cb17c".
     // Version 29: HRV, resting HR and Recovery averages follow Fitbit's vitals. Version 28's value was "1d3f0b8d953960c6".
-    reports: "f8047bb194a9f3e4",
+    // Version 31: the reports carry each day's Recovery. Version 30's value was "f8047bb194a9f3e4".
+    reports: "06bb472d707a755b",
   };
   const canon = (v: unknown): unknown =>
     typeof v === "number"
@@ -457,8 +465,8 @@ describe("numbers checked by hand", () => {
     }
     const d = dayAt(120);
     const m = metrics.get(d)!;
-    // Version 29: Recovery's resting HR is the day's (dayRestingHr), Fitbit's daily value, the one every screen shows.
-    expect(col(d, "recovery").inputs.rhr).toBe(m.rhrBpm);
+    // Version 31 (Pulse+): Recovery's resting HR is the night's quiet-window heart rate; Strain keeps the daily value.
+    expect(col(d, "recovery").inputs.rhr).toBe(roundHr(col(d, "strain").engine?.quiet?.hr));
     expect(col(d, "strain")).toMatchObject({ restingHr: m.rhrBpm, restingHrSource: "daily" });
     // Skin temperature: nightly − Health Connect's baseline (fix 10). Health Monitor (version 24): each vital's normal band
     // is ±1 SD of the last 30 nights, this one included, and the status follows it.
@@ -474,13 +482,13 @@ describe("numbers checked by hand", () => {
     }
   });
 
-  it("Recovery and Health Monitor judge Fitbit's HRV and resting HR on every day, the values the screens show", async () => {
+  it("Recovery judges the nightly HRV and the quiet-window heart rate; Health Monitor shows the nightly HRV and Fitbit's resting HR", async () => {
     const metrics = new Map((await store.allMetrics()).map((m) => [m.day, m]));
     for (const d of allDays) {
       const m = metrics.get(d);
       const rhr = dayRestingHr(m?.rhrBpm, rows.get(d)?.sessionRhrBpm);
       const rec = rows.get(d)?.recovery;
-      if (rec) expect(rec.inputs, d).toMatchObject({ hrv: m?.hrvMs ?? null, rhr });
+      if (rec) expect(rec.inputs, d).toMatchObject({ hrv: m?.hrvMs ?? null, rhr: roundHr(rows.get(d)?.strain?.engine?.quiet?.hr) });
       const hm = rows.get(d)?.health_monitor;
       if (!hm || hm.reason !== null) continue;
       expect(hm.vitals.find((v) => v.key === "hrv")?.value ?? null, d).toBe(m?.hrvMs ?? null);
@@ -488,13 +496,19 @@ describe("numbers checked by hand", () => {
     }
   });
 
-  it("the first night has no baseline; Recovery shows from the second, provisional until 60 days span its data (fix 17)", () => {
-    expect(col(dayAt(0), "recovery")).toMatchObject({ value: null, reason: "calibrating", nightsLeft: 1 });
-    const first = col(dayAt(1), "recovery");
-    expect(first.value).toBeTypeOf("number");
-    expect(first.provisional).toBe(true);
-    expect(col(dayAt(59), "recovery").provisional).toBe(true);
-    expect(col(dayAt(70), "recovery").provisional).toBe(false);
+  it("Recovery waits for 14 prior nights, then shows provisional until 30 days span its data (Pulse+, version 31)", () => {
+    expect(col(dayAt(0), "recovery")).toMatchObject({ value: null, reason: "calibrating", nightsLeft: 14 });
+    expect(col(dayAt(13), "recovery")).toMatchObject({ value: null, reason: "calibrating" });
+    const firstAt = allDays.findIndex((d) => rows.get(d)?.recovery?.value != null);
+    expect(firstAt).toBeGreaterThanOrEqual(14);
+    expect(col(allDays[firstAt], "recovery").provisional).toBe(true);
+    // Calibrated after 30 days, except on a night off the deep-sleep window.
+    const later = allDays.slice(firstAt + 31).filter((d) => {
+      const q = rows.get(d)?.strain?.engine?.quiet;
+      return rows.get(d)?.recovery?.value != null && q?.hrWindow === "deep" && q?.hrvWindow === "deep";
+    });
+    expect(later.length).toBeGreaterThan(50);
+    for (const d of later) expect(col(d, "recovery").provisional, d).toBe(false);
   });
 
   it("skin temperature only ever lowers Recovery; nights without it have no temperature term", () => {

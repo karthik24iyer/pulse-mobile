@@ -32,6 +32,7 @@
     "skinWarmer": "Temperatura de la piel más cálida de lo habitual",
     "skinCooler": "Temperatura de la piel más fría de lo habitual",
     "hrvBelow": "HRV por debajo de la referencia",
+    "hrvHigh": "HRV inusualmente alta: puede seguir a un entrenamiento duro o al inicio de una enfermedad",
     "atBaseline": "{{subject}} en la referencia",
     "slightlyAbove": "{{subject}} ligeramente por encima de la referencia",
     "slightlyBelow": "{{subject}} ligeramente por debajo de la referencia",

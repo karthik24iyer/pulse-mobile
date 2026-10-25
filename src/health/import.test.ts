@@ -295,7 +295,8 @@ describe("metrics", () => {
       TZ,
     );
     expect(metrics).toHaveLength(1);
-    expect(metrics[0]).toMatchObject({ day: "2026-10-02", hrvMs: 45, rhrBpm: 53, respBpm: 14.5, spo2Pct: 96.4, vo2maxDaily: 42.3, steps: null, calories: null });
+    // HRV (Pulse+): an unstaged night uses its whole span, as a geometric mean: √(40 · 50) ≈ 44.7.
+    expect(metrics[0]).toMatchObject({ day: "2026-10-02", hrvMs: 44.7, rhrBpm: 53, respBpm: 14.5, spo2Pct: 96.4, vo2maxDaily: 42.3, steps: null, calories: null });
   });
 
   it("splits VO2 max by Health Connect's measurement method: lab and field tests are measured, the rest estimates", () => {

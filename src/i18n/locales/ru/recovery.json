@@ -32,6 +32,7 @@
     "skinWarmer": "Кожа теплее обычного",
     "skinCooler": "Кожа прохладнее обычного",
     "hrvBelow": "HRV ниже базы",
+    "hrvHigh": "HRV необычно высокая: так бывает после тяжёлой тренировки или в начале болезни",
     "atBaseline": "{{subject}}: на уровне базы",
     "slightlyAbove": "{{subject}}: чуть выше базы",
     "slightlyBelow": "{{subject}}: чуть ниже базы",

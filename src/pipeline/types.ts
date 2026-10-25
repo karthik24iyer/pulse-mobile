@@ -19,6 +19,7 @@ import type { RestingHrSource } from "./restingHr";
 import type { RecoveryBand } from "@/core/scoring/recovery";
 import type { DayAggs } from "@/core/engine/days";
 import type { LoadStatus } from "@/core/engine/strain";
+import type { QuietWindow } from "@/core/engine/quietWindow";
 
 /**
  * Bump on any scoring change; a mismatch at startup reruns both stages for every day.
@@ -80,8 +81,12 @@ import type { LoadStatus } from "@/core/engine/strain";
  * Pulse Age and the reports read Fitbit's nightly HRV and the day's resting HR (dayRestingHr: Fitbit's daily value, else
  * the sleep-session estimate) instead of the engine's own aggregates of the night's samples.
  * 30: Pulse Age's VO2 max falls back to Pulse's own daily estimate when the 28 days have no Fitbit VO2 max.
+ * 31 (Pulse+): Recovery reads the night's deep-sleep window (src/core/engine/quietWindow.ts): the nightly HRV the import
+ * keeps is the geometric mean of the deep-sleep readings (IMPORT_VERSION 8), resting HR is the mean heart rate in the same
+ * window (Stage1Day.engine.quiet), both are scored through the ±0.5 SD normal band (src/core/engine/recovery.ts) against
+ * the last 30 nights (at least 14), and HRV is judged on the log scale. Health Monitor keeps Fitbit's daily resting HR.
  */
-export const SCORING_VERSION = 30;
+export const SCORING_VERSION = 31;
 
 export type PipelineOptions = {
   timeZone: string;
@@ -171,6 +176,11 @@ export type EngineDayAggs = Pick<DayAggs, "restingHRV" | "averageHRV" | "resting
   strain?: { value: number; steps: number; passiveUnits: number; workoutUnits: number; zoneS?: number[]; maxHr?: number } | null;
   /** Version 22: the day's HRV samples as [seconds after local midnight, ms], for Stress and Energy Bank in stage 2. */
   hrv?: [number, number][];
+  /**
+   * Version 31 (Pulse+): the main sleep's quiet window (src/core/engine/quietWindow.ts): mean heart rate there (Recovery's
+   * resting HR) and which window the heart rate and the HRV came from; null without a main sleep.
+   */
+  quiet?: { hr: number | null; hrWindow: QuietWindow | null; hrvWindow: QuietWindow | null } | null;
 };
 
 /**

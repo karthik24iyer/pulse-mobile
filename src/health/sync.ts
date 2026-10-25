@@ -50,9 +50,10 @@ export { forgetChanges };
  * record is left out instead of failing the sync. 6: a sync replaces the window's source-derived daily totals (calories
  * eaten, water, distance and the rest), so a record deleted in Health Connect no longer leaves its day's total behind,
  * and a sync that finds deletions replaces the window it re-reads (see replaceWindow). 7: the source policy is gone; every
- * app's records are kept, the largest source per day for measured totals.
+ * app's records are kept, the largest source per day for measured totals. 8 (Pulse+): a night's HRV is the geometric mean of
+ * its deep-sleep readings (src/core/engine/quietWindow.ts), not the mean of the whole night.
  */
-export const IMPORT_VERSION = 7;
+export const IMPORT_VERSION = 8;
 
 /**
  * How far before the window's first local midnight the reads start. Health Connect returns a record only to a read whose
@@ -455,7 +456,7 @@ export async function syncHealthConnect(store: Store, opts: SyncOptions): Promis
     await slice();
     const exercises = inWindow(await sliced(mapExercisesSteps(input.ExerciseSession ?? [], input.ActiveCaloriesBurned, input.Distance, tz)));
     const dailyValues = [...inWindow(await sliced(mapDailyValuesSteps(input, tz))), ...derived];
-    const metrics = inWindow(await sliced(mapMetricsSteps(input, sessions, stepsByDay, tz)));
+    const metrics = inWindow(await sliced(mapMetricsSteps(input, sessions, stepsByDay, tz, segments)));
     await slice();
     // Water, food and cycle logs made in Fitbit: the window's rows are replaced, so what Fitbit deleted goes too.
     const external = inWindow(mapExternalEntries(input, tz));

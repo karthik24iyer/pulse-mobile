@@ -28,6 +28,7 @@ import type { DailyValue, Exercise, HrSample, HrvSample, Metrics, Segment, Sessi
 import { emptyMetrics } from "@/data/types";
 import { addDays, localDay, localMidnight } from "@/lib/time";
 import { finish, PAUSE_EVERY, type Steps } from "@/lib/yield";
+import { geometricMean, MIN_QUIET_HRV_SAMPLES, quietSamples } from "@/core/engine/quietWindow";
 
 // ───────────────────────────── enum tables (copied; tsc checks they match the library) ─────────────────────────────
 
@@ -819,12 +820,30 @@ export type MetricsInput = Pick<
  * are taken inside the day's main sleep session; without one, HRV falls back to 00:00–12:00 local and the others
  * to the whole day. `stepsByDay` comes from `stepsPerDay`.
  */
-export function mapMetrics(input: MetricsInput, sessions: Session[], stepsByDay: Map<string, number>, tz: string): Metrics[] {
-  return finish(mapMetricsSteps(input, sessions, stepsByDay, tz));
+export function mapMetrics(input: MetricsInput, sessions: Session[], stepsByDay: Map<string, number>, tz: string, segments: Segment[] = []): Metrics[] {
+  return finish(mapMetricsSteps(input, sessions, stepsByDay, tz, segments));
+}
+
+/** Stage segments by session id, each session's in time order. */
+function groupSegments(segments: readonly Segment[]): Map<string, Segment[]> {
+  const out = new Map<string, Segment[]>();
+  for (const g of segments) {
+    const xs = out.get(g.sessionId);
+    if (xs) xs.push(g);
+    else out.set(g.sessionId, [g]);
+  }
+  for (const xs of out.values()) xs.sort((a, b) => a.startTs - b.startTs || a.endTs - b.endTs);
+  return out;
 }
 
 /** mapMetrics, pausing as it goes. */
-export function* mapMetricsSteps(input: MetricsInput, sessions: Session[], stepsByDay: Map<string, number>, tz: string): Steps<Metrics[]> {
+export function* mapMetricsSteps(
+  input: MetricsInput,
+  sessions: Session[],
+  stepsByDay: Map<string, number>,
+  tz: string,
+  segments: Segment[] = [],
+): Steps<Metrics[]> {
   const rows = new Map<string, Metrics>();
   const row = (day: string) => {
     let m = rows.get(day);
@@ -832,7 +851,13 @@ export function* mapMetricsSteps(input: MetricsInput, sessions: Session[], steps
     return m;
   };
   const mainSleep = new Map<string, Interval>();
-  for (const s of sessions) if (s.isMain) mainSleep.set(s.day, { startTs: s.startTs, endTs: s.endTs });
+  const mainSegs = new Map<string, Segment[]>();
+  const segsOf = groupSegments(segments);
+  for (const s of sessions) {
+    if (!s.isMain) continue;
+    mainSleep.set(s.day, { startTs: s.startTs, endTs: s.endTs });
+    mainSegs.set(s.day, segsOf.get(s.id) ?? []);
+  }
 
   // Days with anything nightly: a main sleep, or any instantaneous reading.
   const days = new Set<string>(mainSleep.keys());
@@ -860,7 +885,11 @@ export function* mapMetricsSteps(input: MetricsInput, sessions: Session[], steps
       if (inNight.length) return inNight.map((x) => x.r);
       return xs.filter((x) => (fallback === "morning" ? inside(x.t, morning) : x.day === day)).map((x) => x.r);
     };
-    const hrvMs = mean(nightly(hrv, "morning").map((r) => r.heartRateVariabilityMillis));
+    // HRV (Pulse+): the night's deep-sleep readings, else light and deep sleep, else the whole night (quietWindow.ts),
+    // as a geometric mean (the log scale Recovery scores on); without a main sleep, the morning window.
+    const hrvInNight = night ? hrv.filter((x) => inside(x.t, night)).map((x) => ({ ts: x.t, ms: x.r.heartRateVariabilityMillis })) : [];
+    const quiet = night ? quietSamples(hrvInNight, night, mainSegs.get(day) ?? [], MIN_QUIET_HRV_SAMPLES) : null;
+    const hrvMs = geometricMean(quiet ? quiet.samples.map((x) => x.ms) : nightly(hrv, "morning").map((r) => r.heartRateVariabilityMillis));
     const respBpm = mean(nightly(resp, "day").map((r) => r.rate));
     const spo2Pct = mean(nightly(spo2, "day").map((r) => r.percentage));
     const latestRhr = rhr.filter((x) => x.day === day).at(-1);
@@ -921,7 +950,7 @@ export function mapRecords(input: HealthInput, tz: string): MappedRecords {
   const stepsByDay = stepsPerDay(input.Steps ?? [], tz);
   const exercises = mapExercises(input.ExerciseSession ?? [], input.ActiveCaloriesBurned, input.Distance, tz);
   const dailyValues = mapDailyValues(input, tz);
-  const metrics = mapMetrics(input, sessions, stepsByDay, tz);
+  const metrics = mapMetrics(input, sessions, stepsByDay, tz, segments);
   const externalEntries = mapExternalEntries(input, tz);
   return { metrics, sessions, segments, exercises, hr, hrv, steps, dailyValues, externalEntries };
 }

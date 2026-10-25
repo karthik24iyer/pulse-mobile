@@ -39,6 +39,7 @@ export function driverLabel(d: ChargeDriver): string {
   if (v === "COOLER_THAN_BASELINE_LIMITING") return i18n.t("recovery:driver.skinCooler");
   if (v === "NEAR_BASELINE" || v === "AT_BASELINE") return i18n.t("recovery:driver.atBaseline", { subject });
   if (v === "HRV_SATURATION_LIMITING") return i18n.t("recovery:driver.hrvBelow");
+  if (v === "HRV_UNUSUALLY_HIGH") return i18n.t("recovery:driver.hrvHigh");
   if (v.startsWith("SLIGHTLY_ABOVE")) return i18n.t("recovery:driver.slightlyAbove", { subject });
   if (v.startsWith("SLIGHTLY_BELOW")) return i18n.t("recovery:driver.slightlyBelow", { subject });
   if (v.startsWith("ABOVE")) return i18n.t("recovery:driver.above", { subject });
@@ -128,7 +129,8 @@ export function contributors(row: DayRow | undefined, isToday: boolean, rows?: M
       key: "rhr",
       label: i18n.t("metrics:label.rhr"),
       unit: "bpm",
-      metric: metric("rhr", row?.rhr, missing),
+      // Recovery's own resting HR (the quiet-window heart rate its baseline is in), else the day's.
+      metric: metric("rhr", inputs?.rhr ?? row?.rhr, missing),
       baseline: base(b?.rhr, usable(b?.rhr)),
       points: pts("rhr"),
       direction: "down",

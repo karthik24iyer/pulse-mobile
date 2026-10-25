@@ -269,7 +269,8 @@ describe("syncHealthConnect under Health Connect's start-time reads", () => {
       { metadata: band("nap"), startTime: "2026-10-05T14:00:00Z", endTime: "2026-10-05T14:40:00Z", stages: [stage("2026-10-05T14:00:00Z", "2026-10-05T14:40:00Z", 4)] },
       { metadata: band("nightB"), startTime: "2026-10-05T23:00:00Z", endTime: "2026-10-06T07:00:00Z", stages: [stage("2026-10-05T23:00:00Z", "2026-10-06T01:00:00Z", 4), stage("2026-10-06T01:00:00Z", "2026-10-06T03:00:00Z", 5), stage("2026-10-06T03:00:00Z", "2026-10-06T07:00:00Z", 6)] },
     ];
-    // Night A's HRV: 70 ms before midnight, 40 after (the night's mean is 55).
+    // Night A's HRV: 70 ms before midnight, 40 after. Its deep sleep (01–03) holds one reading, too few, so the night's
+    // HRV (Pulse+) is the light-and-deep window's 70, 70 and 40, as a geometric mean: ≈ 58.1.
     const HeartRateVariabilityRmssd = [
       ...["2026-10-04T23:15:00Z", "2026-10-04T23:45:00Z"].map((time, i) => ({ metadata: band(`hrv-a${i}`), time, heartRateVariabilityMillis: 70 })),
       ...["2026-10-05T01:00:00Z", "2026-10-05T03:00:00Z"].map((time, i) => ({ metadata: band(`hrv-b${i}`), time, heartRateVariabilityMillis: 40 })),
@@ -314,7 +315,7 @@ describe("syncHealthConnect under Health Connect's start-time reads", () => {
     const store = await profiled();
     await syncHealthConnect(store, { timeZone: TZ, now: new Date("2026-10-08T12:00:00Z"), historyDays: 7 });
     const full = await dayOf(store, D);
-    expect(full).toMatchObject({ hrvMs: 55, respBpm: 14, nightlyTempC: 34.5, tempBaselineC: 34, sessions: ["nap:nap", "nightA:main"] });
+    expect(full).toMatchObject({ hrvMs: 58.1, respBpm: 14, nightlyTempC: 34.5, tempBaselineC: 34, sessions: ["nap:nap", "nightA:main"] });
     // Three days after the last sync: D is the window's first day.
     vi.mocked((await import("react-native-health-connect")).getChanges).mockResolvedValue(WRITTEN("2026-10-08") as never);
     const r = await syncHealthConnect(store, { timeZone: TZ, now: new Date("2026-10-08T18:00:00Z"), historyDays: 7 });

@@ -32,6 +32,7 @@
     "skinWarmer": "Temperatura cutanea più alta del solito",
     "skinCooler": "Temperatura cutanea più bassa del solito",
     "hrvBelow": "HRV sotto la tua base",
+    "hrvHigh": "HRV insolitamente alta: può seguire un allenamento intenso o l’inizio di una malattia",
     "atBaseline": "{{subject}} in linea con la base",
     "slightlyAbove": "{{subject}} leggermente sopra la base",
     "slightlyBelow": "{{subject}} leggermente sotto la base",

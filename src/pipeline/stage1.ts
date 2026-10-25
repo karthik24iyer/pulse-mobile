@@ -25,6 +25,8 @@ import { contextAt, minuteHr, timeline, within } from "@/core/engine/context";
 import { baseline, BASELINE_DAYS } from "@/core/engine/baselines";
 import { dayStrain, epoc, hrRecovery as engineHrr, PASSIVE_GAP_S, segmentsOf, trimp, units, workoutStrain, zoneSeconds, zonesOf } from "@/core/engine/strain";
 import { dayAggregates } from "@/core/engine/days";
+import { mean } from "@/core/engine/math";
+import { MIN_QUIET_HR_MINUTES, MIN_QUIET_HRV_SAMPLES, quietSamples } from "@/core/engine/quietWindow";
 import type { HrvSample } from "@/data/types";
 
 /** A baseline whose centre is set, so stress() scores every still minute; only the still mask is kept. */
@@ -298,12 +300,23 @@ function engineDay(
   addZones(awakeSegs);
   const passive = units(awakeSegs, zones, true);
   const awakeSteps = steps.reduce((n, s) => n + (contextAt(tl, s.ts, false) === "awake" ? s.v : 0), 0);
+  // Pulse+ (version 31): the night's quiet window, where Recovery reads HRV and sleeping heart rate.
+  const mainSegs = b.main ? segmentRows.filter((g) => g.sessionId === b.main!.id) : [];
+  const qHr = b.main ? quietSamples(minutes, b.main, mainSegs, MIN_QUIET_HR_MINUTES) : null;
+  const qHrv = b.main ? quietSamples(hrv, b.main, mainSegs, MIN_QUIET_HRV_SAMPLES) : null;
   const day: EngineDayAggs = {
     restingHRV: r4(a.restingHRV),
     averageHRV: r4(a.averageHRV),
     restingHR: r4(a.restingHR),
     inactiveHR: r4(a.inactiveHR),
     hrv: within(hrv, b.start, b.end).map((s): [number, number] => [s.ts - b.start, s.ms]),
+    quiet: b.main
+      ? {
+          hr: qHr ? round(mean(qHr.samples.map((m) => m.bpm))!, 2) : null,
+          hrWindow: qHr?.window ?? null,
+          hrvWindow: qHrv?.window ?? null,
+        }
+      : null,
     strain: hr.length || awakeSteps
       ? {
           value: round(dayStrain(awakeSteps, passive + workoutUnits), 2),

@@ -29,6 +29,8 @@ export type ChargeDriverVerdict =
   | "BELOW_BASELINE_TOO_SMALL"
   | "AT_BASELINE"
   | "HRV_SATURATION_LIMITING"
+  /** Pulse+: HRV more than 2 SD above baseline, noted but not scored down. */
+  | "HRV_UNUSUALLY_HIGH"
   | "STRONG_NIGHT_SUPPORTING"
   | "BELOW_GOOD_NIGHT_LIMITING"
   | "TYPICAL_NIGHT"

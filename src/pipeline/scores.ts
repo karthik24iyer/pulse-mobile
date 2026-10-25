@@ -499,7 +499,9 @@ const daysApart = (a: string, b: string) => Math.round((Date.parse(b) - Date.par
 // ── Health Monitor (nightly rows, oldest first) ──────────────────────────────
 
 export function scoreHealthMonitor(f: Fold, d: Day, inputs: Inputs, rec: RecoveryRow): HealthMonitorRow {
-  const { hrv, rhr, resp, skinTempDev } = rec.inputs;
+  // Resting HR is the day's (Fitbit's daily value), not Recovery's quiet-window heart rate (Pulse+, version 31).
+  const { hrv, resp, skinTempDev } = rec.inputs;
+  const rhr = d.rhr;
   const spo2 = d.dm?.spo2Pct ?? null;
   f.monitorRows.push({ day: d.day, rhr, hrv, resp, spo2, skinTempDev });
   const hasVitals = rhr != null || hrv != null || resp != null || d.dm?.spo2Pct != null || skinTempDev != null;

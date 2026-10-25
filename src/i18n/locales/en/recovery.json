@@ -20,7 +20,7 @@
   },
   "subject": {
     "hrv": "HRV",
-    "rhr": "Resting heart rate",
+    "rhr": "Sleeping heart rate",
     "resp": "Respiratory rate",
     "sleep": "Sleep",
     "skin": "Skin temperature"
@@ -32,6 +32,7 @@
     "skinWarmer": "Skin temperature warmer than usual",
     "skinCooler": "Skin temperature cooler than usual",
     "hrvBelow": "HRV below baseline",
+    "hrvHigh": "HRV unusually high: can follow hard training or the start of an illness",
     "atBaseline": "{{subject}} at baseline",
     "slightlyAbove": "{{subject}} slightly above baseline",
     "slightlyBelow": "{{subject}} slightly below baseline",
