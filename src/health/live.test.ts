@@ -43,7 +43,7 @@ const answer = (samples: { ts: number; bpm: number }[]) => hc.readAll.mockResolv
 beforeEach(() => {
   vi.clearAllMocks();
   hc.availability.mockResolvedValue("available");
-  hc.permissionState.mockResolvedValue({ granted: ["HeartRate"], missing: [], history: true, background: true });
+  hc.permissionState.mockResolvedValue({ granted: ["HeartRate"], missing: [], unsupported: [], history: true, historySupported: true, background: true });
   hc.readAll.mockResolvedValue([]);
 });
 
@@ -149,7 +149,7 @@ describe("refreshRecentHeartRate: Health Connect", () => {
     const store = new MemoryStore();
     const synced = series(at(-15 * 60), at(-5 * 60), 60);
     await store.putHr(synced);
-    hc.permissionState.mockResolvedValue({ granted: [], missing: ["HeartRate"], history: false, background: false });
+    hc.permissionState.mockResolvedValue({ granted: [], missing: ["HeartRate"], unsupported: [], history: false, historySupported: true, background: false });
 
     const r = await refreshRecentHeartRate(store, { now: NOW, timeZone: TZ });
 

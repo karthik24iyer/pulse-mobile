@@ -5,6 +5,8 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
+import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.HealthConnectFeatures
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
@@ -20,6 +22,28 @@ class PulseBtModule : Module() {
     Function("bondedDevices") { bonded() }
 
     Function("openApp") { pkg: String -> open(pkg) }
+
+    Function("healthFeatures") { healthFeatures() }
+  }
+
+  /**
+   * Which feature-gated Health Connect data this phone's Health Connect can serve. Skin temperature and past-data
+   * access only exist on newer Health Connect versions; on older ones their permissions never appear in the sheet,
+   * so they can't be granted and shouldn't be counted as missing. Null when Health Connect can't be reached.
+   */
+  private fun healthFeatures(): Map<String, Boolean>? {
+    val ctx = appContext.reactContext ?: return null
+    return try {
+      val features = HealthConnectClient.getOrCreate(ctx).features
+      fun available(f: Int) = features.getFeatureStatus(f) == HealthConnectFeatures.FEATURE_STATUS_AVAILABLE
+      mapOf(
+        "skinTemperature" to available(HealthConnectFeatures.FEATURE_SKIN_TEMPERATURE),
+        "history" to available(HealthConnectFeatures.FEATURE_READ_HEALTH_DATA_HISTORY),
+        "background" to available(HealthConnectFeatures.FEATURE_READ_HEALTH_DATA_IN_BACKGROUND),
+      )
+    } catch (e: Exception) {
+      null
+    }
   }
 
   /** Paired LE (or dual-mode) devices as { id: address, name }. Empty without Bluetooth or the Nearby devices permission. */

@@ -13,3 +13,8 @@ android {
     versionName '1.0.0'
   }
 }
+
+dependencies {
+  // Same client react-native-health-connect uses, for asking which Health Connect features this phone offers.
+  implementation "androidx.health.connect:connect-client:1.1.0"
+}

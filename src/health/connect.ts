@@ -16,6 +16,7 @@ import {
   type RecordType,
 } from "react-native-health-connect";
 import { PermissionsAndroid, Platform } from "react-native";
+import { healthFeatures } from "../../modules/pulse-bt";
 
 /** Record types Pulse reads, in the order the permission sheet lists them. */
 export const READ_TYPES = [
@@ -73,8 +74,13 @@ export function ensureInitialized(): Promise<boolean> {
 
 export type PermissionState = {
   granted: ReadType[];
+  /** Types this phone's Health Connect offers that the person hasn't granted. */
   missing: ReadType[];
+  /** Types this phone's Health Connect doesn't offer at all (no toggle exists), so they can't be granted. */
+  unsupported: ReadType[];
   history: boolean;
+  /** Health Connect offers past-data access here; false means the 30-day limit can't be lifted, so don't ask. */
+  historySupported: boolean;
   /** Background reads allowed (the background sync task needs it). */
   background: boolean;
 };
@@ -95,17 +101,32 @@ async function historyGranted(): Promise<boolean> {
 }
 type Permission_ = Parameters<typeof PermissionsAndroid.check>[0];
 
+/** Record types gated behind a Health Connect feature, by the feature's key in healthFeatures(). */
+const FEATURE_GATED: Partial<Record<ReadType, "skinTemperature">> = { SkinTemperature: "skinTemperature" };
+
 export async function permissionState(): Promise<PermissionState> {
   await ensureInitialized();
   const granted = await getGrantedPermissions();
   const has = (t: string) => granted.some((p) => p.accessType === "read" && p.recordType === t);
+  // Unknown features (no native module, or the check failed) count as supported, as before.
+  const features = healthFeatures();
+  const supported = (t: ReadType) => {
+    const f = FEATURE_GATED[t];
+    return !f || !features || features[f];
+  };
+  const history = has("ReadHealthDataHistory") || (await historyGranted());
   return {
     granted: READ_TYPES.filter(has),
-    missing: READ_TYPES.filter((t) => !has(t)),
-    history: has("ReadHealthDataHistory") || (await historyGranted()),
+    missing: READ_TYPES.filter((t) => !has(t) && supported(t)),
+    unsupported: READ_TYPES.filter((t) => !has(t) && !supported(t)),
+    history,
+    historySupported: history || !features || features.history,
     background: has("BackgroundAccessPermission"),
   };
 }
+
+/** Whether Settings should nag: a grantable type or grantable past-data access is still off. */
+export const needsMorePermissions = (p: PermissionState) => p.missing.length > 0 || (!p.history && p.historySupported);
 
 /** Shows the system sheet. Returns what the person granted; they may grant a subset. */
 export async function askPermissions(): Promise<PermissionState> {

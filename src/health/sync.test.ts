@@ -13,6 +13,7 @@ vi.mock("@react-native-async-storage/async-storage", () => ({
 }));
 // connect.ts asks Android for the history permission; vitest can't load react-native itself.
 vi.mock("react-native", () => ({ Platform: { OS: "android" }, PermissionsAndroid: { check: vi.fn(async () => false) } }));
+vi.mock("../../modules/pulse-bt", () => ({ healthFeatures: vi.fn(() => null) }));
 vi.mock("react-native-health-connect", () => ({
   getChanges: vi.fn(async () => ({ nextChangesToken: "tok", upsertionChanges: [], deletionChanges: [], hasMore: false, changesTokenExpired: false })),
 }));
@@ -66,7 +67,7 @@ beforeEach(async () => {
   vi.clearAllMocks();
   vi.mocked((await import("react-native-health-connect")).getChanges).mockResolvedValue(NO_CHANGES as never);
   const data = fixture();
-  hc.permissionState.mockResolvedValue({ granted: ["Steps", "TotalCaloriesBurned", "SleepSession", "HeartRate"], missing: [], history: true, background: true });
+  hc.permissionState.mockResolvedValue({ granted: ["Steps", "TotalCaloriesBurned", "SleepSession", "HeartRate"], missing: [], unsupported: [], history: true, historySupported: true, background: true });
   hc.readAll.mockImplementation(startTimeRead(data));
 });
 

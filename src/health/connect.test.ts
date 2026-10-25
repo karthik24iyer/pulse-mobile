@@ -1,10 +1,12 @@
 // readAll over a mocked Health Connect: paging, and a malformed record left out without failing the read.
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { readRecords } from "react-native-health-connect";
-import { readAll, skippedTypes, skippedWarning } from "./connect";
+import { getGrantedPermissions, readRecords } from "react-native-health-connect";
+import { healthFeatures } from "../../modules/pulse-bt";
+import { needsMorePermissions, permissionState, READ_TYPES, readAll, skippedTypes, skippedWarning } from "./connect";
 
 vi.mock("react-native", () => ({ Platform: { OS: "android" }, PermissionsAndroid: { check: vi.fn() } }));
-vi.mock("react-native-health-connect", () => ({ initialize: vi.fn(async () => true), readRecords: vi.fn() }));
+vi.mock("react-native-health-connect", () => ({ initialize: vi.fn(async () => true), readRecords: vi.fn(), getGrantedPermissions: vi.fn() }));
+vi.mock("../../modules/pulse-bt", () => ({ healthFeatures: vi.fn(() => null) }));
 
 type Opts = { timeRangeFilter: { startTime: string; endTime: string }; pageToken?: string };
 const T0 = Date.parse("2026-10-01T00:00:00Z");
@@ -47,5 +49,36 @@ describe("readAll", () => {
 
   it("names the skipped types from the sync's warnings", () => {
     expect(skippedTypes(["permission_missing:Steps", skippedWarning("ExerciseSession"), skippedWarning("SleepSession")])).toEqual(["SleepSession", "ExerciseSession"]);
+  });
+});
+
+describe("permissionState", () => {
+  const grantAllBut = (...left: string[]) =>
+    vi.mocked(getGrantedPermissions).mockResolvedValue(READ_TYPES.filter((t) => !left.includes(t)).map((recordType) => ({ accessType: "read", recordType })) as never);
+
+  it("doesn't count a type this phone's Health Connect doesn't offer as missing", async () => {
+    grantAllBut("SkinTemperature");
+    vi.mocked(healthFeatures).mockReturnValue({ skinTemperature: false, history: false, background: true });
+    const p = await permissionState();
+    expect(p.missing).toEqual([]);
+    expect(p.unsupported).toEqual(["SkinTemperature"]);
+    expect(p.historySupported).toBe(false);
+    expect(needsMorePermissions(p)).toBe(false);
+  });
+
+  it("still asks for a type the phone offers, and for past data when it can be granted", async () => {
+    grantAllBut("SkinTemperature");
+    vi.mocked(healthFeatures).mockReturnValue({ skinTemperature: true, history: true, background: true });
+    const p = await permissionState();
+    expect(p.missing).toEqual(["SkinTemperature"]);
+    expect(needsMorePermissions(p)).toBe(true);
+  });
+
+  it("treats unknown features as supported, as before", async () => {
+    grantAllBut("SkinTemperature");
+    vi.mocked(healthFeatures).mockReturnValue(null);
+    const p = await permissionState();
+    expect(p.missing).toEqual(["SkinTemperature"]);
+    expect(p.historySupported).toBe(true);
   });
 });

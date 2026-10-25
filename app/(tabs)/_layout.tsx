@@ -15,6 +15,8 @@ export default function TabsLayout() {
   return (
     <Tabs
       tabBar={(props) => <TabBar {...props} />}
+      // Back retraces the tabs you visited before it leaves the app, instead of jumping straight to Home.
+      backBehavior="history"
       screenOptions={{
         headerShown: false,
         sceneStyle: { backgroundColor: c.background },

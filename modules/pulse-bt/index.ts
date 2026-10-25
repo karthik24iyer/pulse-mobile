@@ -2,7 +2,12 @@
 // another app. Both are safe to call anywhere: without the native module (tests, web) they return nothing.
 import { requireOptionalNativeModule } from "expo";
 
-type Native = { bondedDevices(): { id: string; name: string | null }[]; openApp(pkg: string): boolean };
+export type HealthFeatures = { skinTemperature: boolean; history: boolean; background: boolean };
+type Native = {
+  bondedDevices(): { id: string; name: string | null }[];
+  openApp(pkg: string): boolean;
+  healthFeatures(): HealthFeatures | null;
+};
 const native = requireOptionalNativeModule<Native>("PulseBt");
 
 /** LE devices paired with this phone, as { id: Bluetooth address, name }. */
@@ -20,5 +25,14 @@ export function openApp(pkg: string): boolean {
     return native?.openApp(pkg) ?? false;
   } catch {
     return false;
+  }
+}
+
+/** Feature-gated Health Connect data this phone can serve; null when unknown (no native module or no Health Connect). */
+export function healthFeatures(): HealthFeatures | null {
+  try {
+    return native?.healthFeatures() ?? null;
+  } catch {
+    return null;
   }
 }
