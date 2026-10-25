@@ -13,6 +13,11 @@ alongside the original.
 - Blood pressure (systolic and diastolic) from Health Connect.
 - Two 2x1 home-screen widgets: heart rate + today's strain, today's water + calories eaten.
 - No "update available" prompts for upstream APKs (they can't install over this package).
+- Recovery reads HRV and heart rate from deep sleep (falling back to light and deep, then the whole night), judges HRV
+  on a log scale, and scores both through a ±0.5 SD normal band against your last 30 nights (see the commit message
+  for the research behind it).
+- Backup and restore (More › Your data › Backup): everything you enter yourself in one JSON file. Restoring merges and
+  never deletes, and also reads the Journal JSON export from Pulse Mobile.
 
 ## Build an APK (Linux)
 
@@ -38,4 +43,5 @@ pnpm install
 cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a
 ```
 
-Run `npx expo prebuild -p android --clean` again after a change to `app.json` or to native modules.
+Run `npx expo prebuild -p android --clean` again after a change to `app.json` or to native modules (the backup
+feature added `expo-document-picker`, so the first build after it needs this).

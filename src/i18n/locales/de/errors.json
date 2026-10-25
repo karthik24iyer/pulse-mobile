@@ -57,6 +57,14 @@
     "sharingUnavailable": "Teilen ist auf diesem Gerät nicht verfügbar.",
     "failed": "Export fehlgeschlagen. Versuch es noch einmal."
   },
+  "backup": {
+    "unreadable": "Die Datei ließ sich nicht öffnen.",
+    "not_json": "Diese Datei ist keine Pulse-Sicherung.",
+    "not_backup": "Diese Datei ist weder eine Pulse-Sicherung noch ein Journal-Export.",
+    "newer_version": "Diese Sicherung stammt aus einer neueren Pulse-Version. Aktualisiere die App und stell sie dann wieder her.",
+    "empty": "Diese Datei enthält nichts zum Wiederherstellen.",
+    "failed": "Wiederherstellen fehlgeschlagen. Es wurde nichts gelöscht; versuch es erneut."
+  },
   "profile": {
     "heightRange": "Zwischen {{low}} und {{high}}",
     "birthDateRange": "Gib ein Geburtsdatum zwischen vor 13 und vor 100 Jahren ein",

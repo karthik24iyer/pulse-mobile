@@ -57,6 +57,14 @@
     "sharingUnavailable": "Sharing isn’t available on this device.",
     "failed": "Couldn’t export. Try again."
   },
+  "backup": {
+    "unreadable": "Couldn’t open that file.",
+    "not_json": "That file isn’t a Pulse backup.",
+    "not_backup": "That file isn’t a Pulse backup or a Journal export.",
+    "newer_version": "That backup comes from a newer Pulse. Update the app, then restore it.",
+    "empty": "That file has nothing to restore.",
+    "failed": "Couldn’t restore. Nothing was deleted; try again."
+  },
   "profile": {
     "heightRange": "Between {{low}} and {{high}}",
     "birthDateRange": "Enter a birth date between 13 and 100 years ago",

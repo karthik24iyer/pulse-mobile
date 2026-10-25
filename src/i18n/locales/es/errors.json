@@ -58,6 +58,14 @@
     "sharingUnavailable": "Compartir no está disponible en este dispositivo.",
     "failed": "No se pudo exportar. Inténtalo de nuevo."
   },
+  "backup": {
+    "unreadable": "No se pudo abrir ese archivo.",
+    "not_json": "Ese archivo no es una copia de Pulse.",
+    "not_backup": "Ese archivo no es una copia de Pulse ni una exportación del diario.",
+    "newer_version": "Esa copia viene de una versión más nueva de Pulse. Actualiza la app y vuelve a restaurarla.",
+    "empty": "Ese archivo no tiene nada que restaurar.",
+    "failed": "No se pudo restaurar. No se borró nada; inténtalo de nuevo."
+  },
   "profile": {
     "heightRange": "Entre {{low}} y {{high}}",
     "birthDateRange": "Ingresa una fecha de nacimiento de hace entre 13 y 100 años",

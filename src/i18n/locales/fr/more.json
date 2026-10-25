@@ -60,7 +60,13 @@
     "dailyBodySince": "Une ligne par jour depuis le {{date}} : Recovery, Strain, Sleep Performance, heures et Sleep Consistency, variabilité de la fréquence cardiaque, fréquence cardiaque au repos, fréquence respiratoire, stress et pas.",
     "journalBody": "Chaque réponse de check-in, comportements masqués inclus. Le JSON liste aussi tes comportements.",
     "storageNone": "Les exports contiennent uniquement ce que Pulse a stocké sur ce téléphone.",
-    "storage": "Pulse occupe {{mb}} Mo sur ce téléphone. Les exports contiennent uniquement ce qu’il a stocké."
+    "storage": "Pulse occupe {{mb}} Mo sur ce téléphone. Les exports contiennent uniquement ce qu’il a stocké.",
+    "backup": "Sauvegarde",
+    "backupBody": "Tout ce que vous saisissez vous-même, dans un fichier : votre profil et votre photo, les comportements et réponses du journal, l’eau, les repas, le poids, les humeurs et les symptômes enregistrés, les discussions avec Coach, ainsi que vos objectifs, votre tableau de bord et les réglages de l’app. Restaurez-la ici après une réinstallation ou un changement de version ; la restauration ajoute et met à jour, sans jamais supprimer. Un export JSON du journal de Pulse Mobile se restaure aussi. Les données Health Connect n’y sont pas : elles reviennent à la prochaine synchronisation.",
+    "backupExport": "Sauvegarder",
+    "backupRestore": "Restaurer",
+    "restoring": "Restauration…",
+    "restored": "{{answers}} réponses du journal et {{logs}} entrées restaurées. Rouvrez Pulse pour appliquer vos réglages."
   },
   "behaviours": {
     "title": "Comportements",

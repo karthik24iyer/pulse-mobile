@@ -60,7 +60,13 @@
     "dailyBodySince": "Una riga per giorno dal {{date}}: Recovery, Strain, performance del sonno, ore e regolarità, variabilità della frequenza cardiaca, frequenza cardiaca a riposo, frequenza respiratoria, stress e passi.",
     "journalBody": "Ogni risposta dei check-in, comprese le abitudini nascoste. Il JSON elenca anche le tue abitudini.",
     "storageNone": "Le esportazioni contengono solo ciò che Pulse ha salvato su questo telefono.",
-    "storage": "Pulse occupa {{mb}} MB su questo telefono. Le esportazioni contengono solo ciò che ha salvato."
+    "storage": "Pulse occupa {{mb}} MB su questo telefono. Le esportazioni contengono solo ciò che ha salvato.",
+    "backup": "Backup",
+    "backupBody": "Tutto ciò che inserisci tu, in un unico file: profilo e foto, comportamenti e risposte del diario, acqua, cibo, peso, umore e sintomi registrati, chat con Coach, e i tuoi obiettivi, la dashboard e le impostazioni dell’app. Ripristinalo qui dopo una reinstallazione o un cambio di versione; il ripristino aggiunge e aggiorna, non cancella mai. Si può ripristinare anche un’esportazione JSON del diario di Pulse Mobile. I dati di Health Connect non sono inclusi: tornano con la prossima sincronizzazione.",
+    "backupExport": "Esegui backup",
+    "backupRestore": "Ripristina",
+    "restoring": "Ripristino…",
+    "restored": "Ripristinate {{answers}} risposte del diario e {{logs}} registrazioni. Riapri Pulse per applicare le impostazioni."
   },
   "behaviours": {
     "title": "Abitudini",

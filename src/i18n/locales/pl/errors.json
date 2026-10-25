@@ -59,6 +59,14 @@
     "sharingUnavailable": "Udostępnianie nie jest dostępne na tym urządzeniu.",
     "failed": "Nie udało się wyeksportować. Spróbuj ponownie."
   },
+  "backup": {
+    "unreadable": "Nie udało się otworzyć pliku.",
+    "not_json": "Ten plik nie jest kopią zapasową Pulse.",
+    "not_backup": "Ten plik nie jest kopią zapasową Pulse ani eksportem dziennika.",
+    "newer_version": "Ta kopia pochodzi z nowszej wersji Pulse. Zaktualizuj aplikację i przywróć ją ponownie.",
+    "empty": "W tym pliku nie ma nic do przywrócenia.",
+    "failed": "Nie udało się przywrócić. Nic nie zostało usunięte; spróbuj ponownie."
+  },
   "profile": {
     "heightRange": "Od {{low}} do {{high}}",
     "birthDateRange": "Podaj datę urodzenia sprzed 13 do 100 lat",

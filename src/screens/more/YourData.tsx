@@ -1,10 +1,11 @@
 // Your data `/more/data` (U21): your daily scores and journal answers as CSV or JSON. Ported from pulse
 // (app)/more/data/page.tsx and loading.tsx. A download becomes the system share sheet (src/actions/export.ts): Save to
-// Files, AirDrop, Drive, mail. The web's Backup card was never in the page; there is nothing else to export or restore here.
+// Files, AirDrop, Drive, mail. Pulse+ adds a Backup card: everything entered by hand, backed up and restored (src/actions/backup.ts).
 import { useState } from "react";
 import { View } from "react-native";
 import { useTranslation } from "react-i18next";
-import { Download } from "lucide-react-native";
+import { Download, Upload } from "lucide-react-native";
+import { restoreBackup, shareBackup } from "@/actions/backup";
 import { type ExportFormat, type ExportKind, shareExport } from "@/actions/export";
 import { DAY, FORMATS, formatDay } from "@/lib/format";
 import { getYourData } from "@/queries/settings";
@@ -42,6 +43,55 @@ function DownloadLink({ kind, format, busy, setBusy }: { kind: ExportKind; forma
       <Icon icon={Download} size={20} tone="secondary-foreground" />
       <Text className="text-[13px] font-bold uppercase tracking-[0.1em] text-secondary-foreground">{busy === id ? t("data.preparing") : format.toUpperCase()}</Text>
     </Button>
+  );
+}
+
+/**
+ * Backup (Pulse+): everything entered by hand as one file, and restore from one (a Pulse+ backup or Pulse Mobile's
+ * Journal JSON). Restoring merges and never deletes.
+ */
+function BackupCard({ busy, setBusy }: { busy: string | null; setBusy: (id: string | null) => void }) {
+  const { t } = useTranslation("more");
+  const label = "text-[13px] font-bold uppercase tracking-[0.1em] text-secondary-foreground";
+  return (
+    <SectionShell variant="card" title={t("data.backup")} info={false}>
+      <Text className={BODY}>{t("data.backupBody")}</Text>
+      <View className="mt-4 flex-row gap-2">
+        <Button
+          variant="secondary"
+          className="flex-1"
+          disabled={busy !== null}
+          accessibilityLabel={t("data.backupExport")}
+          onPress={async () => {
+            haptic.tap();
+            setBusy("backup");
+            const r = await shareBackup();
+            setBusy(null);
+            if (!r.ok) toast.error(r.error);
+          }}
+        >
+          <Icon icon={Download} size={20} tone="secondary-foreground" />
+          <Text className={label}>{busy === "backup" ? t("data.preparing") : t("data.backupExport")}</Text>
+        </Button>
+        <Button
+          variant="secondary"
+          className="flex-1"
+          disabled={busy !== null}
+          accessibilityLabel={t("data.backupRestore")}
+          onPress={async () => {
+            haptic.tap();
+            setBusy("restore");
+            const r = await restoreBackup();
+            setBusy(null);
+            if (!r.ok) toast.error(r.error);
+            else if (r.data) toast.success(t("data.restored", { answers: r.data.answers, logs: r.data.logs }));
+          }}
+        >
+          <Icon icon={Upload} size={20} tone="secondary-foreground" />
+          <Text className={label}>{busy === "restore" ? t("data.restoring") : t("data.backupRestore")}</Text>
+        </Button>
+      </View>
+    </SectionShell>
   );
 }
 
@@ -118,6 +168,8 @@ export function YourDataScreen() {
                 {link("journal", "json")}
               </View>
             </SectionShell>
+
+            <BackupCard busy={busy} setBusy={setBusy} />
 
             <Text className={CAPTION}>
               {vm.storageBytes === null

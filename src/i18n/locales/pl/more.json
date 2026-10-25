@@ -63,7 +63,13 @@
     "dailyBodySince": "Jeden wiersz na dzień od {{date}}: Recovery, Strain, Sleep Performance, godziny i regularność snu, zmienność rytmu serca, tętno spoczynkowe, częstość oddechów, stres i kroki.",
     "journalBody": "Każda odpowiedź z check-inu, także ukrytych zachowań. JSON zawiera też listę Twoich zachowań.",
     "storageNone": "Eksporty zawierają tylko to, co Pulse zapisał na tym telefonie.",
-    "storage": "Pulse zajmuje na tym telefonie {{mb}} MB. Eksporty zawierają tylko to, co zapisał."
+    "storage": "Pulse zajmuje na tym telefonie {{mb}} MB. Eksporty zawierają tylko to, co zapisał.",
+    "backup": "Kopia zapasowa",
+    "backupBody": "Wszystko, co wpisujesz sam, w jednym pliku: profil i zdjęcie, zachowania i odpowiedzi z dziennika, zapisane picie, jedzenie, waga, nastroje i objawy, czaty z Coach oraz twoje cele, pulpit i ustawienia aplikacji. Przywróć ją tutaj po ponownej instalacji lub zmianie wersji; przywracanie dodaje i aktualizuje, nigdy nie usuwa. Można też przywrócić eksport JSON dziennika z Pulse Mobile. Danych z Health Connect w nim nie ma: wrócą przy następnej synchronizacji.",
+    "backupExport": "Utwórz kopię",
+    "backupRestore": "Przywróć",
+    "restoring": "Przywracanie…",
+    "restored": "Przywrócono odpowiedzi z dziennika ({{answers}}) i wpisy ({{logs}}). Otwórz Pulse ponownie, aby zastosować ustawienia."
   },
   "behaviours": {
     "title": "Zachowania",

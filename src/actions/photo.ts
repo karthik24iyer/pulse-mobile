@@ -31,6 +31,30 @@ export function deletePhoto(uri: string) {
   } catch {}
 }
 
+/** The saved photo as base64, for a backup (Pulse+); null when it is gone or unreadable. */
+export async function photoBase64(uri: string): Promise<string | null> {
+  try {
+    const f = new File(uri);
+    return f.exists ? await f.base64() : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Saves a photo from a backup (base64 JPEG) under a new name; its URI, or null when it can't be written. */
+export function savePhotoBase64(data: string): string | null {
+  try {
+    const d = dir();
+    d.create({ idempotent: true, intermediates: true });
+    const out = new File(d, `${Date.now()}.jpg`);
+    out.create({ overwrite: true });
+    out.write(data, { encoding: "base64" });
+    return out.uri;
+  } catch {
+    return null;
+  }
+}
+
 /** Deletes every saved photo (Delete everything). */
 export function deleteAllPhotos() {
   try {

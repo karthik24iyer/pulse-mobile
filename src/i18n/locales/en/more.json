@@ -57,7 +57,13 @@
     "dailyBodySince": "One row per day since {{date}}: Recovery, Strain, sleep performance, hours and consistency, heart rate variability, resting heart rate, respiratory rate, stress and steps.",
     "journalBody": "Every check-in answer, hidden behaviours included. The JSON also lists your behaviours.",
     "storageNone": "Exports hold only what Pulse stored on this phone.",
-    "storage": "Pulse keeps {{mb}} MB on this phone. Exports hold only what it stored."
+    "storage": "Pulse keeps {{mb}} MB on this phone. Exports hold only what it stored.",
+    "backup": "Backup",
+    "backupBody": "Everything you enter yourself, in one file: your profile and photo, Journal behaviours and answers, logged water, food, weight, moods and symptoms, Coach chats, and your Goals, Dashboard and app settings. Restore it here after reinstalling or switching versions; restoring adds and updates, and never deletes. A Journal JSON export from Pulse Mobile restores too. Health Connect data isn’t in it: it comes back with the next sync.",
+    "backupExport": "Back up",
+    "backupRestore": "Restore",
+    "restoring": "Restoring…",
+    "restored": "Restored {{answers}} Journal answers and {{logs}} log entries. Reopen Pulse to apply your settings."
   },
   "behaviours": {
     "title": "Behaviours",

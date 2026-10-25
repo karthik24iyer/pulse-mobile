@@ -58,6 +58,14 @@
     "sharingUnavailable": "Le partage n’est pas disponible sur cet appareil.",
     "failed": "Impossible d’exporter. Réessaie."
   },
+  "backup": {
+    "unreadable": "Impossible d’ouvrir ce fichier.",
+    "not_json": "Ce fichier n’est pas une sauvegarde Pulse.",
+    "not_backup": "Ce fichier n’est ni une sauvegarde Pulse ni un export du journal.",
+    "newer_version": "Cette sauvegarde vient d’une version plus récente de Pulse. Mettez l’app à jour, puis restaurez-la.",
+    "empty": "Ce fichier ne contient rien à restaurer.",
+    "failed": "Échec de la restauration. Rien n’a été supprimé ; réessayez."
+  },
   "profile": {
     "heightRange": "Entre {{low}} et {{high}}",
     "birthDateRange": "Saisis une date de naissance entre 13 et 100 ans en arrière",

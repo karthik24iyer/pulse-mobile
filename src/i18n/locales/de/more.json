@@ -57,7 +57,13 @@
     "dailyBodySince": "Eine Zeile pro Tag seit {{date}}: Recovery, Strain, Sleep Performance, Stunden und Konstanz, Herzfrequenzvariabilität, Ruheherzfrequenz, Atemfrequenz, Stress und Schritte.",
     "journalBody": "Jede Check-in-Antwort, auch ausgeblendete Gewohnheiten. Die JSON-Datei listet außerdem deine Gewohnheiten auf.",
     "storageNone": "Exporte enthalten nur das, was Pulse auf diesem Handy gespeichert hat.",
-    "storage": "Pulse belegt {{mb}} MB auf diesem Handy. Exporte enthalten nur, was es gespeichert hat."
+    "storage": "Pulse belegt {{mb}} MB auf diesem Handy. Exporte enthalten nur, was es gespeichert hat.",
+    "backup": "Sicherung",
+    "backupBody": "Alles, was du selbst eingibst, in einer Datei: Profil und Foto, Journal-Verhaltensweisen und Antworten, erfasstes Wasser, Essen, Gewicht, Stimmungen und Symptome, Coach-Chats sowie deine Ziele, dein Dashboard und die App-Einstellungen. Stell sie hier nach einer Neuinstallation oder einem Versionswechsel wieder her; die Wiederherstellung ergänzt und aktualisiert, löscht aber nie. Auch ein Journal-JSON-Export aus Pulse Mobile lässt sich wiederherstellen. Daten aus Health Connect sind nicht enthalten: Sie kommen mit der nächsten Synchronisierung zurück.",
+    "backupExport": "Sichern",
+    "backupRestore": "Wiederherstellen",
+    "restoring": "Wird wiederhergestellt…",
+    "restored": "{{answers}} Journal-Antworten und {{logs}} Einträge wiederhergestellt. Öffne Pulse erneut, um deine Einstellungen zu übernehmen."
   },
   "behaviours": {
     "title": "Gewohnheiten",
