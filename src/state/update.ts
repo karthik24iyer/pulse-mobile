@@ -16,6 +16,7 @@ export const RELEASES_URL = "https://api.github.com/repos/adityaongit/pulse-mobi
 
 const CHECK_EVERY_MS = 24 * 60 * 60 * 1000;
 const TIMEOUT_MS = 15_000;
+const PERSONAL_BUILD = true;
 /** The last check: when, and the release it found ({ checkedAt, release }). */
 const CACHE_KEY = "pulse.update";
 /** "off" when the person turned the check off. */
@@ -50,6 +51,9 @@ export const getUpdate = () => state;
 
 /** The release's notice for this phone: a later version than this one, with an APK for its CPU, not put off. */
 function noticeFor(release: Release | null) {
+  // Personal build (its own package and signing key): the upstream APK can't install over it, so never offer it.
+  // Upstream changes come in by merging the repository instead.
+  if (PERSONAL_BUILD) return null;
   if (later || !release || !isNewer(release.version, APP_VERSION)) return null;
   const apk = apkFor(release, Device.supportedCpuArchitectures ?? []);
   return apk ? { ...release, apk } : null;
